@@ -1,5 +1,13 @@
 import { useState, useEffect, useRef, useCallback } from 'react';
-import { GameStats, SystemState, SystemType, GameEvent, Achievement, SessionData, CareerData } from '../types';
+import {
+  GameStats,
+  SystemState,
+  SystemType,
+  GameEvent,
+  Achievement,
+  SessionData,
+  CareerData
+} from '../types';
 
 interface UseAchievementSystemProps {
   stats: GameStats;
@@ -89,7 +97,9 @@ export const ACHIEVEMENTS: Achievement[] = [
     icon: '💎',
     category: 'PERFECTION',
     checkCondition: (stats, systems, events, sessionData) => {
-      return sessionData.eventsFailed === 0 && stats.timeRemaining <= 0 && sessionData.eventsResolved > 0;
+      return (
+        sessionData.eventsFailed === 0 && stats.timeRemaining <= 0 && sessionData.eventsResolved > 0
+      );
     },
     rewardPoints: 70
   },
@@ -189,16 +199,16 @@ export const useAchievementSystem = ({
     const now = Date.now();
     const timePlayed = (now - sessionStartTime.current) / 1000;
 
-    setSessionData(prev => {
+    setSessionData((prev) => {
       const minHealth = Math.min(
         prev.minSystemHealth,
-        ...Object.values(systems).map(s => s.health)
+        ...Object.values(systems).map((s) => s.health)
       );
       const maxStress = Math.max(prev.maxStress, stats.stress);
 
       // Check perfect streak (all systems in safe zone 40-60%)
-      const allInSafeZone = Object.values(systems).every(s => 
-        s.faderValue >= 40 && s.faderValue <= 60 && s.status === 'OK'
+      const allInSafeZone = Object.values(systems).every(
+        (s) => s.faderValue >= 40 && s.faderValue <= 60 && s.status === 'OK'
       );
 
       let perfectStreak = prev.perfectStreak;
@@ -226,14 +236,21 @@ export const useAchievementSystem = ({
   const checkAchievements = useCallback((force: boolean = false) => {
     if (!force && !isPlayingRef.current) return;
 
-    ACHIEVEMENTS.forEach(achievement => {
+    ACHIEVEMENTS.forEach((achievement) => {
       // Skip if already unlocked
       if (careerDataRef.current.unlockedAchievements.includes(achievement.id)) {
         return;
       }
 
       // Check condition
-      if (achievement.checkCondition(statsRef.current, systemsRef.current, activeEventsRef.current, sessionDataRef.current)) {
+      if (
+        achievement.checkCondition(
+          statsRef.current,
+          systemsRef.current,
+          activeEventsRef.current,
+          sessionDataRef.current
+        )
+      ) {
         onAchievementUnlockedRef.current(achievement.id, achievement.rewardPoints);
       }
     });
@@ -257,7 +274,7 @@ export const useAchievementSystem = ({
 
   // Track events resolved/failed
   const trackEventResolved = useCallback((success: boolean) => {
-    setSessionData(prev => ({
+    setSessionData((prev) => ({
       ...prev,
       eventsResolved: success ? prev.eventsResolved + 1 : prev.eventsResolved,
       eventsFailed: success ? prev.eventsFailed : prev.eventsFailed + 1
@@ -266,7 +283,7 @@ export const useAchievementSystem = ({
 
   // Track spending
   const trackSpending = useCallback((amount: number) => {
-    setSessionData(prev => ({
+    setSessionData((prev) => ({
       ...prev,
       totalSpent: prev.totalSpent + amount
     }));

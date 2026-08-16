@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import React from 'react';
 import { afterEach, beforeEach, describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import { ErrorBoundary } from '../components/ErrorBoundary';
@@ -75,7 +74,9 @@ describe('ErrorBoundary', () => {
     );
 
     const loggedOurMessage = consoleError.mock.calls.some((call) =>
-      call.some((arg) => typeof arg === 'string' && arg.includes('Unhandled error in Event Chaos UI'))
+      call.some(
+        (arg) => typeof arg === 'string' && arg.includes('Unhandled error in Event Chaos UI')
+      )
     );
     expect(loggedOurMessage).toBe(true);
   });

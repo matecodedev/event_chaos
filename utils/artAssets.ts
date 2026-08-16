@@ -65,9 +65,10 @@ export const getStageAsset = <T extends keyof typeof ART_ASSETS.stage>(asset: T)
 export const getStageScenarioVisualAsset = (scenarioId: string) =>
   getScenarioThumbnailAsset(scenarioId);
 
-export const getFxTextureCssVariables = () => ({
-  ['--aaa-fx-noise-image' as string]: `url('${ART_ASSETS.fx.noise}')`,
-  ['--aaa-fx-scanlines-image' as string]: `url('${ART_ASSETS.fx.scanlines}')`,
-  ['--aaa-fx-warning-chevron-image' as string]: `url('${ART_ASSETS.fx.warningChevrons}')`,
-  ['--aaa-fx-scratches-image' as string]: `url('${ART_ASSETS.fx.scratches}')`
-}) as Record<string, string>;
+export const getFxTextureCssVariables = () =>
+  ({
+    ['--aaa-fx-noise-image' as string]: `url('${ART_ASSETS.fx.noise}')`,
+    ['--aaa-fx-scanlines-image' as string]: `url('${ART_ASSETS.fx.scanlines}')`,
+    ['--aaa-fx-warning-chevron-image' as string]: `url('${ART_ASSETS.fx.warningChevrons}')`,
+    ['--aaa-fx-scratches-image' as string]: `url('${ART_ASSETS.fx.scratches}')`
+  }) as Record<string, string>;

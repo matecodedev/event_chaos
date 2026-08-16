@@ -74,7 +74,7 @@ export const getDevicePerformanceBudget = ({
   const cpuScore = clamp(hardwareConcurrency, 2, 16) / 8;
   const platformPenalty = isMobile ? 0.3 : 0;
   const reducedMotionPenalty = prefersReducedMotion ? 0.25 : 0;
-  const totalScore = (memoryScore * 0.58) + (cpuScore * 0.42) - platformPenalty - reducedMotionPenalty;
+  const totalScore = memoryScore * 0.58 + cpuScore * 0.42 - platformPenalty - reducedMotionPenalty;
 
   if (totalScore < 0.9) {
     return {
@@ -115,8 +115,16 @@ export const getVisualizerTargetFps = (
 ) => {
   const stress = clamp(stressLevel, 0, 100);
   const baseFps = isMobile
-    ? (stress > 80 ? 28 : stress > 55 ? 32 : 36)
-    : (stress > 85 ? 45 : stress > 60 ? 52 : 60);
+    ? stress > 80
+      ? 28
+      : stress > 55
+        ? 32
+        : 36
+    : stress > 85
+      ? 45
+      : stress > 60
+        ? 52
+        : 60;
 
   if (qualityMode === 'PERFORMANCE') {
     const performance = isMobile ? baseFps + 4 : baseFps + 6;
@@ -146,10 +154,10 @@ export const getVisualQualityProfile = ({
     prefersReducedMotion
   });
   const stress = clamp(stressLevel, 0, 100);
-  const eventLoad = clamp((activeEvents * 0.1) + (criticalEvents * 0.22), 0, 1.3);
+  const eventLoad = clamp(activeEvents * 0.1 + criticalEvents * 0.22, 0, 1.3);
   const stressLoad = stress / 100;
   const memoryPenalty = deviceMemoryGb <= 4 ? 0.16 : deviceMemoryGb <= 6 ? 0.08 : 0;
-  const compositeLoad = clamp(eventLoad + (stressLoad * 0.42) + memoryPenalty, 0, 1);
+  const compositeLoad = clamp(eventLoad + stressLoad * 0.42 + memoryPenalty, 0, 1);
 
   let targetFps = isMobile ? 38 : 60;
   if (isMobile) {
@@ -181,7 +189,7 @@ export const getVisualQualityProfile = ({
 
   const noiseScale = prefersReducedMotion
     ? 0.18
-    : clamp((isMobile ? 0.62 : 1) - (compositeLoad * 0.18), 0.25, 1);
+    : clamp((isMobile ? 0.62 : 1) - compositeLoad * 0.18, 0.25, 1);
   const noiseAdjusted =
     qualityMode === 'PERFORMANCE'
       ? clamp(noiseScale * 0.78, 0.18, 1)
@@ -191,7 +199,7 @@ export const getVisualQualityProfile = ({
 
   const glitchScale = prefersReducedMotion
     ? 0.2
-    : clamp((isMobile ? 0.72 : 1) - (compositeLoad * 0.15), 0.35, 1);
+    : clamp((isMobile ? 0.72 : 1) - compositeLoad * 0.15, 0.35, 1);
   const glitchAdjusted =
     qualityMode === 'PERFORMANCE'
       ? clamp(glitchScale * 0.8, 0.2, 1)
@@ -200,9 +208,7 @@ export const getVisualQualityProfile = ({
         : glitchScale;
   const lowTierVisualPenalty = perfBudget.tier === 'LOW' ? 0.92 : 1;
 
-  const scanlineOpacity = prefersReducedMotion
-    ? 0
-    : (isMobile ? 0.025 : 0.04);
+  const scanlineOpacity = prefersReducedMotion ? 0 : isMobile ? 0.025 : 0.04;
   const scanlineAdjusted =
     qualityMode === 'PERFORMANCE'
       ? clamp(scanlineOpacity * 0.55, 0, 0.08)
@@ -210,7 +216,7 @@ export const getVisualQualityProfile = ({
         ? clamp(scanlineOpacity * 1.5, 0, 0.1)
         : scanlineOpacity;
 
-  const trailAlpha = clamp((isMobile ? 0.28 : 0.2) + (stressLoad * 0.12), 0.18, 0.42);
+  const trailAlpha = clamp((isMobile ? 0.28 : 0.2) + stressLoad * 0.12, 0.18, 0.42);
   const trailAdjusted =
     qualityMode === 'PERFORMANCE'
       ? clamp(trailAlpha * 0.92, 0.16, 0.42)
@@ -239,15 +245,24 @@ export const getFxRenderPlan = ({
   isPageVisible = true
 }: FxRenderPlanInput): FxRenderPlan => {
   const stress = clamp(stressLevel, 0, 100);
-  const loadScore = activeEvents + (criticalEvents * 2) + (stress / 25);
+  const loadScore = activeEvents + criticalEvents * 2 + stress / 25;
   const lowPower = prefersReducedMotion || profile.targetFps <= 30 || (isMobile && loadScore >= 6);
-  const ultraLowPower = prefersReducedMotion || profile.targetFps <= 24 || (isMobile && loadScore >= 8);
+  const ultraLowPower =
+    prefersReducedMotion || profile.targetFps <= 24 || (isMobile && loadScore >= 8);
 
   const dprCap = prefersReducedMotion
     ? 1
     : isMobile
-      ? ultraLowPower ? 1 : lowPower ? 1.25 : 1.5
-      : ultraLowPower ? 1.2 : lowPower ? 1.5 : 1.75;
+      ? ultraLowPower
+        ? 1
+        : lowPower
+          ? 1.25
+          : 1.5
+      : ultraLowPower
+        ? 1.2
+        : lowPower
+          ? 1.5
+          : 1.75;
 
   return {
     shouldRender: isPageVisible,

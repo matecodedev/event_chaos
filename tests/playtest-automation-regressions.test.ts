@@ -34,7 +34,8 @@ describe('Playtest Automation Regressions', () => {
       const rand = makeRng(seed);
       const difficulty = DIFFICULTIES[toInt(rand(), 0, DIFFICULTIES.length - 1)];
       const mode = MODES[toInt(rand(), 0, MODES.length - 1)];
-      const totalDuration = mode === GameMode.SPEEDRUN ? 90 : mode === GameMode.ENDLESS ? 3600 : 120;
+      const totalDuration =
+        mode === GameMode.SPEEDRUN ? 90 : mode === GameMode.ENDLESS ? 3600 : 120;
       const timeRemaining = toInt(rand(), 0, totalDuration);
 
       const stats = {
@@ -120,12 +121,20 @@ describe('Playtest Automation Regressions', () => {
       failedEvents: 18,
       expiredEvents: 12,
       totalSpend: 18000,
-      recentOutcomes: ['FAIL', 'FAIL', 'FAIL', 'SUCCESS', 'FAIL', 'FAIL', 'FAIL', 'FAIL'] as Array<'SUCCESS' | 'FAIL'>
+      recentOutcomes: ['FAIL', 'FAIL', 'FAIL', 'SUCCESS', 'FAIL', 'FAIL', 'FAIL', 'FAIL'] as Array<
+        'SUCCESS' | 'FAIL'
+      >
     };
 
     const phase = getMatchPhase(GameMode.HARDCORE, 8, 120, 97);
     const baseProfile = getPhaseDirectorProfile('EXTREME', GameMode.HARDCORE, phase, 97);
-    const target = getSessionDifficultyTarget('EXTREME', telemetry, { stress: 97, budget: -1200 }, 6, 4200);
+    const target = getSessionDifficultyTarget(
+      'EXTREME',
+      telemetry,
+      { stress: 97, budget: -1200 },
+      6,
+      4200
+    );
     const adaptive = getAdaptiveDirectorAdjustments(target);
     const runtimeProfile = composeDirectorProfile(baseProfile, adaptive);
 

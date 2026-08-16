@@ -1,4 +1,3 @@
-
 import { useState, useCallback } from 'react';
 import { GameEvent, SystemType } from '../types';
 import { SYSTEM_EVENTS } from '../constants';
@@ -13,19 +12,22 @@ const isAllowedForScenario = (allowedScenarios: string[] | undefined, scenarioId
   if (allowedScenarios.includes(scenarioId)) return true;
 
   if (HARD_SCENARIOS.has(scenarioId)) {
-    return allowedScenarios.some(id => HARD_SCENARIOS.has(id));
+    return allowedScenarios.some((id) => HARD_SCENARIOS.has(id));
   }
 
   if (EXTREME_SCENARIOS.has(scenarioId)) {
-    return allowedScenarios.some(id => EXTREME_SCENARIOS.has(id) || HARD_SCENARIOS.has(id));
+    return allowedScenarios.some((id) => EXTREME_SCENARIOS.has(id) || HARD_SCENARIOS.has(id));
   }
 
   return false;
 };
 
-const pickScenarioWeightedTemplate = <T extends { allowedScenarios?: string[] }>(templates: T[], scenarioId: string) => {
+const pickScenarioWeightedTemplate = <T extends { allowedScenarios?: string[] }>(
+  templates: T[],
+  scenarioId: string
+) => {
   if (templates.length === 0) return null;
-  const weightedPool = templates.flatMap(template => {
+  const weightedPool = templates.flatMap((template) => {
     const hasDirectMatch = template.allowedScenarios?.includes(scenarioId);
     const weight = hasDirectMatch ? 3 : 1;
     return Array.from({ length: weight }, () => template);
@@ -48,31 +50,33 @@ export const useAIEventGenerator = () => {
     setIsGeneratingEvents(true);
     try {
       const delayMs = getProceduralEventGenerationDelayMs();
-      await new Promise(resolve => setTimeout(resolve, delayMs));
+      await new Promise((resolve) => setTimeout(resolve, delayMs));
 
       // Main local generation logic
       const newEvents: GameEvent[] = [];
       const systems = Object.values(SystemType);
-      
+
       // Generate 2 random static events based on context
       for (let i = 0; i < 2; i++) {
         const sys = systems[Math.floor(Math.random() * systems.length)];
         const pool = SYSTEM_EVENTS[sys];
-        
-        const validEvents = pool.filter(e => isAllowedForScenario(e.allowedScenarios, scenarioId));
+
+        const validEvents = pool.filter((e) =>
+          isAllowedForScenario(e.allowedScenarios, scenarioId)
+        );
         const finalPool = validEvents.length > 0 ? validEvents : pool;
-        
+
         const template = pickScenarioWeightedTemplate(finalPool, scenarioId) || finalPool[0];
 
         newEvents.push({
-            id: `static-${Date.now()}-${i}`,
-            systemId: sys,
-            title: template.title,
-            description: template.description,
-            severity: 2,
-            expiresAt: Date.now() + 30000,
-            correctAction: "",
-            options: template.options
+          id: `static-${Date.now()}-${i}`,
+          systemId: sys,
+          title: template.title,
+          description: template.description,
+          severity: 2,
+          expiresAt: Date.now() + 30000,
+          correctAction: '',
+          options: template.options
         });
       }
 

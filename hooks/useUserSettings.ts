@@ -2,7 +2,12 @@ import { useCallback, useEffect, useState } from 'react';
 import { DEFAULT_USER_AUDIO_MIX, normalizeUserAudioMix } from './useSoundSynth';
 import type { AudioSpatialMode, UserAudioMix } from './useSoundSynth';
 import type { VisualQualityMode } from '../utils/visualPerformance';
-import { readStoredJson, readStoredValue, writeStoredJson, writeStoredValue } from '../utils/safeStorage';
+import {
+  readStoredJson,
+  readStoredValue,
+  writeStoredJson,
+  writeStoredValue
+} from '../utils/safeStorage';
 
 const VISUAL_QUALITY_STORAGE_KEY = 'event_chaos_visual_quality_mode';
 const USER_SETTINGS_STORAGE_KEY = 'event_chaos_user_settings_v1';
@@ -52,14 +57,16 @@ const readInitialSpatialMode = (): AudioSpatialMode => {
  * announce it without this hook needing to know about the game log.
  */
 export const useUserSettings = () => {
-  const [visualQualityMode, setVisualQualityMode] = useState<VisualQualityMode>(readInitialVisualQuality);
+  const [visualQualityMode, setVisualQualityMode] =
+    useState<VisualQualityMode>(readInitialVisualQuality);
   const [reducedMotion, setReducedMotion] = useState<boolean>(() =>
     Boolean(loadStoredUserSettings().reducedMotion)
   );
   const [highContrastUi, setHighContrastUi] = useState<boolean>(() =>
     Boolean(loadStoredUserSettings().highContrastUi)
   );
-  const [audioSpatialMode, setAudioSpatialMode] = useState<AudioSpatialMode>(readInitialSpatialMode);
+  const [audioSpatialMode, setAudioSpatialMode] =
+    useState<AudioSpatialMode>(readInitialSpatialMode);
   const [audioMix, setAudioMix] = useState<UserAudioMix>(() =>
     normalizeUserAudioMix(loadStoredUserSettings().audioMix || DEFAULT_USER_AUDIO_MIX)
   );

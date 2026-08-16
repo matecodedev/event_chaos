@@ -1,9 +1,6 @@
 import { describe, expect, it } from 'vitest';
 import { GameScenario, SystemState, SystemType } from '../types';
-import {
-  buildNarrativeStageKey,
-  pickNarrativeSequenceStage
-} from '../hooks/useNarrativeSystem';
+import { buildNarrativeStageKey, pickNarrativeSequenceStage } from '../hooks/useNarrativeSystem';
 
 const baseScenario = (id: string): GameScenario => ({
   id,
@@ -74,7 +71,8 @@ const SEQUENCES_FIXTURE = [
         title: 'S2',
         message: 'two',
         cooldown: 1000,
-        triggerCondition: (stats: any, systems: any) => stats.timeRemaining < 80 && systems[SystemType.SOUND].faderValue > 50
+        triggerCondition: (stats: any, systems: any) =>
+          stats.timeRemaining < 80 && systems[SystemType.SOUND].faderValue > 50
       }
     ]
   }

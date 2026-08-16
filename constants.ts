@@ -1,4 +1,13 @@
-import { SystemType, EventDefinition, GameScenario, CrewMember, ShopItem, MissionDefinition, TutorialStep, PermanentUpgrade } from './types';
+import {
+  SystemType,
+  EventDefinition,
+  GameScenario,
+  CrewMember,
+  ShopItem,
+  MissionDefinition,
+  TutorialStep,
+  PermanentUpgrade
+} from './types';
 
 // Game Configuration
 export const GAME_DURATION = 120; // seconds
@@ -22,28 +31,28 @@ export const EVENT_FREQUENCY_BASE = 15000; // ms
 // Client Messages
 export const CLIENT_MESSAGES = {
   HAPPY: [
-    "¡El show está increíble!",
-    "El público está encantado",
-    "Todo está perfecto, sigue así",
-    "Excelente trabajo técnico"
+    '¡El show está increíble!',
+    'El público está encantado',
+    'Todo está perfecto, sigue así',
+    'Excelente trabajo técnico'
   ],
   ANGRY: [
-    "¿Qué está pasando?",
-    "El público se está aburriendo",
-    "Necesito que esto mejore YA",
-    "Esto no es lo que esperaba"
+    '¿Qué está pasando?',
+    'El público se está aburriendo',
+    'Necesito que esto mejore YA',
+    'Esto no es lo que esperaba'
   ],
   PANIC: [
-    "¡ESTO ES UN DESASTRE!",
-    "¡ARREGLALO AHORA!",
-    "¡EL SHOW SE ESTÁ YENDO A PEDAZOS!",
-    "¡NO PUEDO CREER ESTO!"
+    '¡ESTO ES UN DESASTRE!',
+    '¡ARREGLALO AHORA!',
+    '¡EL SHOW SE ESTÁ YENDO A PEDAZOS!',
+    '¡NO PUEDO CREER ESTO!'
   ],
   NEUTRAL: [
-    "Todo parece estar bien",
-    "Mantén el ritmo",
-    "Sigue monitoreando",
-    "Estamos en el camino correcto"
+    'Todo parece estar bien',
+    'Mantén el ritmo',
+    'Sigue monitoreando',
+    'Estamos en el camino correcto'
   ]
 };
 
@@ -473,7 +482,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       options: [
         { label: 'Verificar conexiones a tierra', isCorrect: true, stressImpact: -5, cost: 200 },
         { label: 'Aumentar el volumen para taparlo', isCorrect: false, stressImpact: 20 },
-        { label: 'Desconectar y reconectar', isCorrect: false, stressImpact: 10, requiresMinigame: 'CABLES' }
+        {
+          label: 'Desconectar y reconectar',
+          isCorrect: false,
+          stressImpact: 10,
+          requiresMinigame: 'CABLES'
+        }
       ],
       priority: 6,
       canEscalate: true,
@@ -485,7 +499,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Cable Cortado',
       description: 'Un cable importante se ha cortado',
       options: [
-        { label: 'Reparar cable (minijuego)', isCorrect: true, stressImpact: -10, requiresMinigame: 'CABLES' },
+        {
+          label: 'Reparar cable (minijuego)',
+          isCorrect: true,
+          stressImpact: -10,
+          requiresMinigame: 'CABLES'
+        },
         { label: 'Usar cable de respaldo', isCorrect: true, stressImpact: -5, cost: 300 },
         { label: 'Continuar sin ese canal', isCorrect: false, stressImpact: 15 }
       ],
@@ -531,7 +550,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Interferencia de Radio',
       description: 'Hay interferencia de radio frecuencia en el sistema',
       options: [
-        { label: 'Ajustar frecuencias (minijuego)', isCorrect: true, stressImpact: -10, requiresMinigame: 'FREQUENCY' },
+        {
+          label: 'Ajustar frecuencias (minijuego)',
+          isCorrect: true,
+          stressImpact: -10,
+          requiresMinigame: 'FREQUENCY'
+        },
         { label: 'Usar filtros de RF', isCorrect: true, stressImpact: -5, cost: 250 },
         { label: 'Ignorar', isCorrect: false, stressImpact: 12 }
       ],
@@ -543,7 +567,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       description: 'Los monitores de escenario no funcionan',
       options: [
         { label: 'Reparar monitores', isCorrect: true, stressImpact: -5, cost: 200 },
-        { label: 'Usar sistema de monitores alternativo', isCorrect: true, stressImpact: -3, cost: 150 },
+        {
+          label: 'Usar sistema de monitores alternativo',
+          isCorrect: true,
+          stressImpact: -3,
+          cost: 150
+        },
         { label: 'Continuar sin monitores', isCorrect: false, stressImpact: 15 }
       ],
       priority: 4,
@@ -586,7 +615,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Problema con Subwoofers',
       description: 'Los subwoofers no están funcionando correctamente',
       options: [
-        { label: 'Verificar conexiones de subwoofers', isCorrect: true, stressImpact: -5, cost: 100 },
+        {
+          label: 'Verificar conexiones de subwoofers',
+          isCorrect: true,
+          stressImpact: -5,
+          cost: 100
+        },
         { label: 'Ajustar crossover', isCorrect: true, stressImpact: -3 },
         { label: 'Continuar sin graves', isCorrect: false, stressImpact: 15 }
       ],
@@ -657,7 +691,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'DMX Desconectado',
       description: 'La señal DMX se ha perdido',
       options: [
-        { label: 'Reconectar cable DMX', isCorrect: true, stressImpact: -5, requiresMinigame: 'CABLES' },
+        {
+          label: 'Reconectar cable DMX',
+          isCorrect: true,
+          stressImpact: -5,
+          requiresMinigame: 'CABLES'
+        },
         { label: 'Usar backup DMX', isCorrect: true, stressImpact: -3, cost: 150 },
         { label: 'Continuar sin control', isCorrect: false, stressImpact: 15 }
       ],
@@ -734,7 +773,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Cable de Alimentación Suelto',
       description: 'Un cable de alimentación se ha desconectado',
       options: [
-        { label: 'Reconectar cable', isCorrect: true, stressImpact: -5, requiresMinigame: 'CABLES' },
+        {
+          label: 'Reconectar cable',
+          isCorrect: true,
+          stressImpact: -5,
+          requiresMinigame: 'CABLES'
+        },
         { label: 'Usar fuente alternativa', isCorrect: true, stressImpact: -3, cost: 100 },
         { label: 'Continuar sin esa luz', isCorrect: false, stressImpact: 12 }
       ],
@@ -796,17 +840,31 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       description: 'Todo el sistema de video ha fallado',
       options: [
         { label: 'Reiniciar todo el sistema', isCorrect: true, stressImpact: -12, cost: 400 },
-        { label: 'Usar sistema de respaldo completo', isCorrect: true, stressImpact: -10, cost: 600 },
+        {
+          label: 'Usar sistema de respaldo completo',
+          isCorrect: true,
+          stressImpact: -10,
+          cost: 600
+        },
         { label: 'Continuar sin video', isCorrect: false, stressImpact: 30 }
       ],
       priority: 9,
-      relatedTo: ['Caída de Sistema Completo', 'Corte de Energía en Luces', 'Corte de Energía Total']
+      relatedTo: [
+        'Caída de Sistema Completo',
+        'Corte de Energía en Luces',
+        'Corte de Energía Total'
+      ]
     },
     {
       title: 'Resolución Incorrecta',
       description: 'La resolución del video no coincide',
       options: [
-        { label: 'Ajustar resolución (minijuego)', isCorrect: true, stressImpact: -10, requiresMinigame: 'FREQUENCY' },
+        {
+          label: 'Ajustar resolución (minijuego)',
+          isCorrect: true,
+          stressImpact: -10,
+          requiresMinigame: 'FREQUENCY'
+        },
         { label: 'Usar fuente alternativa', isCorrect: true, stressImpact: -5, cost: 200 },
         { label: 'Ignorar', isCorrect: false, stressImpact: 12 }
       ],
@@ -827,7 +885,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Señal de Video Perdida',
       description: 'La señal de entrada se ha perdido',
       options: [
-        { label: 'Verificar conexiones', isCorrect: true, stressImpact: -5, requiresMinigame: 'CABLES' },
+        {
+          label: 'Verificar conexiones',
+          isCorrect: true,
+          stressImpact: -5,
+          requiresMinigame: 'CABLES'
+        },
         { label: 'Usar fuente de respaldo', isCorrect: true, stressImpact: -3, cost: 150 },
         { label: 'Continuar sin señal', isCorrect: false, stressImpact: 15 }
       ],
@@ -839,7 +902,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       description: 'La imagen está pixelada y con artefactos',
       options: [
         { label: 'Verificar calidad de señal', isCorrect: true, stressImpact: -5 },
-        { label: 'Cambiar a conexión de mayor calidad', isCorrect: true, stressImpact: -3, cost: 200 },
+        {
+          label: 'Cambiar a conexión de mayor calidad',
+          isCorrect: true,
+          stressImpact: -3,
+          cost: 200
+        },
         { label: 'Continuar pixelado', isCorrect: false, stressImpact: 10 }
       ],
       priority: 4,
@@ -871,7 +939,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Cable HDMI Roto',
       description: 'El cable HDMI principal está dañado',
       options: [
-        { label: 'Reparar cable (minijuego)', isCorrect: true, stressImpact: -5, requiresMinigame: 'CABLES' },
+        {
+          label: 'Reparar cable (minijuego)',
+          isCorrect: true,
+          stressImpact: -5,
+          requiresMinigame: 'CABLES'
+        },
         { label: 'Usar cable de respaldo', isCorrect: true, stressImpact: -3, cost: 100 },
         { label: 'Continuar sin esa fuente', isCorrect: false, stressImpact: 12 }
       ],
@@ -954,7 +1027,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Corte de Energía Total',
       description: 'Todo el escenario ha perdido energía',
       options: [
-        { label: 'Activar generador de emergencia', isCorrect: true, stressImpact: -15, cost: 1000 },
+        {
+          label: 'Activar generador de emergencia',
+          isCorrect: true,
+          stressImpact: -15,
+          cost: 1000
+        },
         { label: 'Reducir todos los sistemas', isCorrect: true, stressImpact: -12 },
         { label: 'Evacuar', isCorrect: false, stressImpact: 60 }
       ],
@@ -1009,7 +1087,12 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Cable de Alimentación Principal Dañado',
       description: 'El cable principal de alimentación está dañado',
       options: [
-        { label: 'Reparar cable (minijuego)', isCorrect: true, stressImpact: -10, requiresMinigame: 'CABLES' },
+        {
+          label: 'Reparar cable (minijuego)',
+          isCorrect: true,
+          stressImpact: -10,
+          requiresMinigame: 'CABLES'
+        },
         { label: 'Usar línea de respaldo', isCorrect: true, stressImpact: -8, cost: 500 },
         { label: 'Continuar con riesgo', isCorrect: false, stressImpact: 25 }
       ],
@@ -1086,12 +1169,21 @@ export const SYSTEM_EVENTS: Record<SystemType, EventDefinition[]> = {
       title: 'Protocolo Blackout Activado',
       description: 'El escenario entró en protocolo de contingencia por fallas encadenadas',
       options: [
-        { label: 'Ejecutar checklist de contingencia', isCorrect: true, stressImpact: -12, cost: 400 },
+        {
+          label: 'Ejecutar checklist de contingencia',
+          isCorrect: true,
+          stressImpact: -12,
+          cost: 400
+        },
         { label: 'Asegurar solo sistemas vitales', isCorrect: true, stressImpact: -9 },
         { label: 'Reintentar arranque completo', isCorrect: false, stressImpact: 30 }
       ],
       priority: 10,
-      relatedTo: ['Matriz de Delay Corrupta', 'Colisión de Universos DMX', 'Encoder de Streaming Inestable'],
+      relatedTo: [
+        'Matriz de Delay Corrupta',
+        'Colisión de Universos DMX',
+        'Encoder de Streaming Inestable'
+      ],
       allowedScenarios: ['BLACKOUT_PROTOCOL']
     }
   ]

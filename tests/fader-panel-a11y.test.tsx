@@ -66,12 +66,15 @@ describe('FaderPanel accessibility', () => {
       })
     });
 
-    expect(screen.getByRole('slider', { name: 'Fader de SOUND' }).getAttribute('aria-valuetext'))
-      .toBe('50 por ciento, zona segura');
-    expect(screen.getByRole('slider', { name: 'Fader de LIGHTS' }).getAttribute('aria-valuetext'))
-      .toBe('30 por ciento, fuera de la zona segura');
-    expect(screen.getByRole('slider', { name: 'Fader de VIDEO' }).getAttribute('aria-valuetext'))
-      .toBe('90 por ciento, zona crítica');
+    expect(
+      screen.getByRole('slider', { name: 'Fader de SOUND' }).getAttribute('aria-valuetext')
+    ).toBe('50 por ciento, zona segura');
+    expect(
+      screen.getByRole('slider', { name: 'Fader de LIGHTS' }).getAttribute('aria-valuetext')
+    ).toBe('30 por ciento, fuera de la zona segura');
+    expect(
+      screen.getByRole('slider', { name: 'Fader de VIDEO' }).getAttribute('aria-valuetext')
+    ).toBe('90 por ciento, zona crítica');
   });
 
   it('is reachable with the keyboard alone', async () => {
@@ -82,7 +85,9 @@ describe('FaderPanel accessibility', () => {
     // The first stop is the system selector button, the second is its slider.
     const focusedTags: string[] = [];
     for (let i = 0; i < 2; i += 1) {
-      focusedTags.push(document.activeElement?.getAttribute('role') ?? document.activeElement?.tagName ?? '');
+      focusedTags.push(
+        document.activeElement?.getAttribute('role') ?? document.activeElement?.tagName ?? ''
+      );
       await user.tab();
     }
 
@@ -190,7 +195,8 @@ describe('FaderPanel accessibility', () => {
   it('announces a system in critical state through its selector label', () => {
     renderPanel({ systems: buildSystems({ [SystemType.LIGHTS]: 95 }) });
 
-    expect(screen.getByRole('button', { name: 'Seleccionar sistema LIGHTS (en estado crítico)' }))
-      .toBeDefined();
+    expect(
+      screen.getByRole('button', { name: 'Seleccionar sistema LIGHTS (en estado crítico)' })
+    ).toBeDefined();
   });
 });

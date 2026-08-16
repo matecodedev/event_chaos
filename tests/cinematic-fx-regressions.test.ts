@@ -8,8 +8,12 @@ import {
 
 describe('Cinematic FX Regressions', () => {
   it('maps key game-state transitions to cinematic presets', () => {
-    expect(getCinematicTransitionStyle(GameState.PAUSED, GameState.PLAYING)?.label).toBe('REANUDANDO SHOW');
-    expect(getCinematicTransitionStyle(GameState.PLAYING, GameState.PAUSED)?.label).toBe('PAUSA TÁCTICA');
+    expect(getCinematicTransitionStyle(GameState.PAUSED, GameState.PLAYING)?.label).toBe(
+      'REANUDANDO SHOW'
+    );
+    expect(getCinematicTransitionStyle(GameState.PLAYING, GameState.PAUSED)?.label).toBe(
+      'PAUSA TÁCTICA'
+    );
     expect(getCinematicTransitionStyle(GameState.PLAYING, GameState.VICTORY)?.tint).toBe('EMERALD');
     expect(getCinematicTransitionStyle(GameState.PLAYING, GameState.GAME_OVER)?.tint).toBe('RED');
     expect(getCinematicTransitionStyle(GameState.MENU, GameState.MENU)).toBeNull();

@@ -8,7 +8,11 @@ interface AchievementPanelProps {
   onClose: () => void;
 }
 
-export const AchievementPanel: React.FC<AchievementPanelProps> = ({ achievements, unlockedIds, onClose }) => {
+export const AchievementPanel: React.FC<AchievementPanelProps> = ({
+  achievements,
+  unlockedIds,
+  onClose
+}) => {
   const categoryColors = {
     PERFORMANCE: 'text-blue-400',
     ECONOMY: 'text-green-400',
@@ -26,7 +30,10 @@ export const AchievementPanel: React.FC<AchievementPanelProps> = ({ achievements
         className="bg-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
       >
         <div className="flex justify-between items-center mb-6">
-          <h2 id="achievements-title" className="text-3xl font-bold text-white flex items-center gap-2">
+          <h2
+            id="achievements-title"
+            className="text-3xl font-bold text-white flex items-center gap-2"
+          >
             <Trophy aria-hidden="true" className="w-8 h-8 text-yellow-500" />
             LOGROS
           </h2>
@@ -41,7 +48,7 @@ export const AchievementPanel: React.FC<AchievementPanelProps> = ({ achievements
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {achievements.map(achievement => {
+          {achievements.map((achievement) => {
             const isUnlocked = unlockedIds.includes(achievement.id);
             return (
               <div

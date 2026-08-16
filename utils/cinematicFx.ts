@@ -38,14 +38,10 @@ export const getCinematicTransitionStyle = (
   return null;
 };
 
-export const getThreatLevel = (
-  stress: number,
-  criticalEvents: number,
-  warningEvents: number
-) => {
+export const getThreatLevel = (stress: number, criticalEvents: number, warningEvents: number) => {
   const normalizedStress = clamp(stress, 0, 100) / 100;
-  const eventLoad = clamp((criticalEvents * 0.42) + (warningEvents * 0.14), 0, 1);
-  return clamp((normalizedStress * 0.68) + (eventLoad * 0.52), 0, 1);
+  const eventLoad = clamp(criticalEvents * 0.42 + warningEvents * 0.14, 0, 1);
+  return clamp(normalizedStress * 0.68 + eventLoad * 0.52, 0, 1);
 };
 
 export type ThreatTone = 'CALM' | 'ELEVATED' | 'CRITICAL';
@@ -57,10 +53,7 @@ export interface ThreatRailProfile {
   glowStrength: number;
 }
 
-export const getThreatRailProfile = (
-  threatLevel: number,
-  paused: boolean
-): ThreatRailProfile => {
+export const getThreatRailProfile = (threatLevel: number, paused: boolean): ThreatRailProfile => {
   const normalized = clamp(threatLevel, 0, 1);
   const damp = paused ? 0.7 : 1;
 

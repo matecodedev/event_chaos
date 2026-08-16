@@ -26,19 +26,12 @@ interface VisualizerProps {
 }
 
 type StageImageKey =
-  | 'bg'
-  | 'scenario'
-  | 'trussHorizontal'
-  | 'trussVertical'
-  | 'lineArray'
-  | 'movingHead'
-  | 'ledFrame';
+  'bg' | 'scenario' | 'trussHorizontal' | 'trussVertical' | 'lineArray' | 'movingHead' | 'ledFrame';
 
 const imageReady = (image?: HTMLImageElement): image is HTMLImageElement =>
   Boolean(image && image.complete && image.naturalWidth > 0 && image.naturalHeight > 0);
 
-const clamp = (value: number, min: number, max: number) =>
-  Math.min(max, Math.max(min, value));
+const clamp = (value: number, min: number, max: number) => Math.min(max, Math.max(min, value));
 
 const drawImageCover = (
   ctx: CanvasRenderingContext2D,
@@ -158,7 +151,12 @@ export const Visualizer: React.FC<VisualizerProps> = ({
   useEffect(() => {
     let animationFrameId: number;
     const animate = (timestamp: number) => {
-      const targetFps = getVisualizerTargetFps(isMobile, stressLevel, qualityMode, reducedMotionOverride);
+      const targetFps = getVisualizerTargetFps(
+        isMobile,
+        stressLevel,
+        qualityMode,
+        reducedMotionOverride
+      );
       const minDelta = getFrameIntervalMs(targetFps);
       if (timestamp - lastRenderTimeRef.current >= minDelta) {
         lastRenderTimeRef.current = timestamp;
@@ -210,7 +208,15 @@ export const Visualizer: React.FC<VisualizerProps> = ({
     }
 
     if (imageReady(stageImages.scenario)) {
-      drawImageCover(ctx, stageImages.scenario, W * 0.12, H * 0.18, W * 0.76, H * 0.54, 0.2 + videoVal / 500);
+      drawImageCover(
+        ctx,
+        stageImages.scenario,
+        W * 0.12,
+        H * 0.18,
+        W * 0.76,
+        H * 0.54,
+        0.2 + videoVal / 500
+      );
     }
 
     const roomGradient = ctx.createLinearGradient(0, 0, 0, H);
@@ -257,7 +263,15 @@ export const Visualizer: React.FC<VisualizerProps> = ({
     const sideTrussH = H * 0.7;
 
     if (imageReady(stageImages.trussHorizontal)) {
-      drawImageCover(ctx, stageImages.trussHorizontal, W * 0.03, topTrussY, W * 0.94, topTrussH, 0.92);
+      drawImageCover(
+        ctx,
+        stageImages.trussHorizontal,
+        W * 0.03,
+        topTrussY,
+        W * 0.94,
+        topTrussH,
+        0.92
+      );
     } else {
       ctx.strokeStyle = 'rgba(131, 153, 190, 0.6)';
       ctx.lineWidth = 2;
@@ -265,8 +279,24 @@ export const Visualizer: React.FC<VisualizerProps> = ({
     }
 
     if (imageReady(stageImages.trussVertical)) {
-      drawImageCover(ctx, stageImages.trussVertical, W * 0.07, sideTrussTop, sideTrussW, sideTrussH, 0.82);
-      drawImageCover(ctx, stageImages.trussVertical, W * 0.87, sideTrussTop, sideTrussW, sideTrussH, 0.82);
+      drawImageCover(
+        ctx,
+        stageImages.trussVertical,
+        W * 0.07,
+        sideTrussTop,
+        sideTrussW,
+        sideTrussH,
+        0.82
+      );
+      drawImageCover(
+        ctx,
+        stageImages.trussVertical,
+        W * 0.87,
+        sideTrussTop,
+        sideTrussW,
+        sideTrussH,
+        0.82
+      );
     }
 
     const lineArrayW = clamp(W * 0.12, 56, 132);
@@ -280,7 +310,7 @@ export const Visualizer: React.FC<VisualizerProps> = ({
       ctx.save();
       ctx.globalCompositeOperation = 'screen';
       for (let wave = 0; wave < 3; wave += 1) {
-        const waveRadius = ((tick * 3.4) + wave * 34) % 150;
+        const waveRadius = (tick * 3.4 + wave * 34) % 150;
         const waveOpacity = (1 - waveRadius / 150) * (audioVal / 100) * 0.42;
         ctx.strokeStyle = `rgba(126, 214, 255, ${waveOpacity})`;
         ctx.lineWidth = 2;
@@ -294,11 +324,12 @@ export const Visualizer: React.FC<VisualizerProps> = ({
     const drawFeedbackRings = (originX: number, originY: number) => {
       if (audioStat !== 'CRITICAL' && audioVal <= 90) return;
       for (let ring = 0; ring < 2; ring += 1) {
-        const radius = ((tick * 5) + ring * 55) % 210;
+        const radius = (tick * 5 + ring * 55) % 210;
         const opacity = 1 - radius / 210;
-        ctx.strokeStyle = ring === 0
-          ? `rgba(255, 66, 66, ${opacity * 0.7})`
-          : `rgba(255, 170, 56, ${opacity * 0.52})`;
+        ctx.strokeStyle =
+          ring === 0
+            ? `rgba(255, 66, 66, ${opacity * 0.7})`
+            : `rgba(255, 170, 56, ${opacity * 0.52})`;
         ctx.lineWidth = ring === 0 ? 3 : 2;
         ctx.beginPath();
         ctx.arc(originX, originY, radius, 0, Math.PI * 2);
@@ -367,7 +398,12 @@ export const Visualizer: React.FC<VisualizerProps> = ({
         );
       }
 
-      const ledTint = ctx.createLinearGradient(screenX, screenY, screenX + screenW, screenY + screenH);
+      const ledTint = ctx.createLinearGradient(
+        screenX,
+        screenY,
+        screenX + screenW,
+        screenY + screenH
+      );
       ledTint.addColorStop(0, `rgba(23, 118, 180, ${0.18 + vIntensity * 0.2})`);
       ledTint.addColorStop(0.5, `rgba(45, 220, 210, ${0.14 + vIntensity * 0.16})`);
       ledTint.addColorStop(1, `rgba(14, 42, 88, ${0.22 + vIntensity * 0.2})`);
@@ -389,7 +425,7 @@ export const Visualizer: React.FC<VisualizerProps> = ({
         const barW = screenW / (eqBars * 1.3);
         for (let i = 0; i < eqBars; i += 1) {
           const baseX = screenX + 18 + i * barW * 1.3;
-          const amplitude = (Math.sin((tick * 0.08) + i * 0.7) + 1) * 0.5;
+          const amplitude = (Math.sin(tick * 0.08 + i * 0.7) + 1) * 0.5;
           const barH = 8 + amplitude * (screenH * 0.32) * vIntensity;
           ctx.fillStyle = `rgba(${90 + i * 8}, ${220 - i * 5}, 255, ${0.16 + vIntensity * 0.32})`;
           ctx.fillRect(baseX, screenY + screenH - 14 - barH, barW, barH);
@@ -399,7 +435,15 @@ export const Visualizer: React.FC<VisualizerProps> = ({
     ctx.restore();
 
     if (imageReady(stageImages.ledFrame)) {
-      drawImageCover(ctx, stageImages.ledFrame, screenX - 10, screenY - 10, screenW + 20, screenH + 20, 0.95);
+      drawImageCover(
+        ctx,
+        stageImages.ledFrame,
+        screenX - 10,
+        screenY - 10,
+        screenW + 20,
+        screenH + 20,
+        0.95
+      );
     } else {
       ctx.strokeStyle = 'rgba(106, 176, 226, 0.7)';
       ctx.lineWidth = 2;
@@ -461,7 +505,15 @@ export const Visualizer: React.FC<VisualizerProps> = ({
         const hue = (tick * 1.8 + i * 64) % 360;
 
         if (imageReady(stageImages.movingHead)) {
-          drawImageContain(ctx, stageImages.movingHead, fixtureX - fixtureW / 2, fixtureY - fixtureH * 0.65, fixtureW, fixtureH, 0.94);
+          drawImageContain(
+            ctx,
+            stageImages.movingHead,
+            fixtureX - fixtureW / 2,
+            fixtureY - fixtureH * 0.65,
+            fixtureW,
+            fixtureH,
+            0.94
+          );
         }
 
         drawBeam(fixtureX, fixtureY + 2, baseAngle, hue);
@@ -615,11 +667,18 @@ export const Visualizer: React.FC<VisualizerProps> = ({
     <div className="w-full h-full bg-[#050505] rounded-lg overflow-hidden border border-slate-700 relative shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] group">
       {/* Purely visual stage render: every value it shows is also exposed by the
           fader sliders and the HUD progress bars. */}
-      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 z-10 w-full h-full block" />
+      <canvas
+        ref={canvasRef}
+        aria-hidden="true"
+        className="absolute inset-0 z-10 w-full h-full block"
+      />
 
       <div
         className="absolute inset-0 bg-repeat opacity-20 pointer-events-none z-20"
-        style={{ backgroundImage: `url('${ART_ASSETS.fx.scratches}')`, backgroundSize: '480px 480px' }}
+        style={{
+          backgroundImage: `url('${ART_ASSETS.fx.scratches}')`,
+          backgroundSize: '480px 480px'
+        }}
       />
 
       {renderTechData()}

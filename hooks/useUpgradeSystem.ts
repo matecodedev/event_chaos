@@ -23,43 +23,57 @@ export type PurchaseUpgradeResult =
   | { status: 'MISSING_REQUIREMENTS'; missingRequirements: string[] };
 
 export const useUpgradeSystem = ({ careerData, onUpgradePurchased }: UseUpgradeSystemProps) => {
-  const canAfford = useCallback((cost: number) => {
-    return careerData.careerPoints >= cost;
-  }, [careerData.careerPoints]);
+  const canAfford = useCallback(
+    (cost: number) => {
+      return careerData.careerPoints >= cost;
+    },
+    [careerData.careerPoints]
+  );
 
-  const isUnlocked = useCallback((upgradeId: string) => {
-    return careerData.unlockedUpgrades.includes(upgradeId);
-  }, [careerData.unlockedUpgrades]);
+  const isUnlocked = useCallback(
+    (upgradeId: string) => {
+      return careerData.unlockedUpgrades.includes(upgradeId);
+    },
+    [careerData.unlockedUpgrades]
+  );
 
-  const getMissingRequirements = useCallback((upgrade: PermanentUpgrade) => {
-    const requirements = upgrade.requires || [];
-    return requirements.filter(requirementId => !careerData.unlockedUpgrades.includes(requirementId));
-  }, [careerData.unlockedUpgrades]);
+  const getMissingRequirements = useCallback(
+    (upgrade: PermanentUpgrade) => {
+      const requirements = upgrade.requires || [];
+      return requirements.filter(
+        (requirementId) => !careerData.unlockedUpgrades.includes(requirementId)
+      );
+    },
+    [careerData.unlockedUpgrades]
+  );
 
   const getRequirementNames = useCallback((missingRequirements: string[]) => {
-    return missingRequirements.map(requirementId => {
-      const requirement = PERMANENT_UPGRADES.find(upgrade => upgrade.id === requirementId);
+    return missingRequirements.map((requirementId) => {
+      const requirement = PERMANENT_UPGRADES.find((upgrade) => upgrade.id === requirementId);
       return requirement?.name || requirementId;
     });
   }, []);
 
-  const purchaseUpgrade = useCallback((upgrade: PermanentUpgrade): PurchaseUpgradeResult => {
-    if (isUnlocked(upgrade.id)) {
-      return { status: 'ALREADY_UNLOCKED' };
-    }
+  const purchaseUpgrade = useCallback(
+    (upgrade: PermanentUpgrade): PurchaseUpgradeResult => {
+      if (isUnlocked(upgrade.id)) {
+        return { status: 'ALREADY_UNLOCKED' };
+      }
 
-    const missingRequirements = getMissingRequirements(upgrade);
-    if (missingRequirements.length > 0) {
-      return { status: 'MISSING_REQUIREMENTS', missingRequirements };
-    }
+      const missingRequirements = getMissingRequirements(upgrade);
+      if (missingRequirements.length > 0) {
+        return { status: 'MISSING_REQUIREMENTS', missingRequirements };
+      }
 
-    if (!canAfford(upgrade.cost)) {
-      return { status: 'INSUFFICIENT_POINTS' };
-    }
+      if (!canAfford(upgrade.cost)) {
+        return { status: 'INSUFFICIENT_POINTS' };
+      }
 
-    onUpgradePurchased(upgrade.id, upgrade.cost);
-    return { status: 'SUCCESS' };
-  }, [canAfford, getMissingRequirements, isUnlocked, onUpgradePurchased]);
+      onUpgradePurchased(upgrade.id, upgrade.cost);
+      return { status: 'SUCCESS' };
+    },
+    [canAfford, getMissingRequirements, isUnlocked, onUpgradePurchased]
+  );
 
   const getAvailableUpgrades = useCallback(() => {
     return PERMANENT_UPGRADES.map((upgrade): AvailableUpgrade => {

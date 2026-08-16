@@ -24,7 +24,7 @@ export const shouldTriggerImmediateGameOver = (
   winConditions: WinConditions
 ) => {
   if (scenario.isTutorial) return false;
-  if (mode === GameMode.HARDCORE && systems.some(system => system.health <= 0)) return true;
+  if (mode === GameMode.HARDCORE && systems.some((system) => system.health <= 0)) return true;
 
   return (
     stats.publicInterest <= 0 ||
@@ -71,4 +71,3 @@ export const getCrewStressMultiplier = (crewBonus: string | null) => {
 export const getCrewAutoHealPer5Seconds = (crewBonus: string | null) => {
   return crewBonus === 'AUTO_REPAIR_SLOW' ? 0.5 : 0;
 };
-

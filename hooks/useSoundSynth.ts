@@ -1,4 +1,3 @@
-
 import { useCallback, useRef } from 'react';
 import { GameMode, GameState, SystemState, SystemType } from '../types';
 
@@ -6,17 +5,14 @@ const clamp = (value: number, min: number, max: number) => Math.min(max, Math.ma
 
 export const getMasterGainTarget = (faderValue: number, status: string, stress: number) => {
   const base = clamp(faderValue / 100, 0, 1) * 0.42;
-  const statusPenalty =
-    status === 'CRITICAL' ? 0.65 :
-    status === 'WARNING' ? 0.82 :
-    1.0;
-  const stressPenalty = 1 - clamp(stress, 0, 100) / 100 * 0.2;
+  const statusPenalty = status === 'CRITICAL' ? 0.65 : status === 'WARNING' ? 0.82 : 1.0;
+  const stressPenalty = 1 - (clamp(stress, 0, 100) / 100) * 0.2;
   return clamp(base * statusPenalty * stressPenalty, 0.02, 0.5);
 };
 
 export const getReverbWetTarget = (stageFader: number, stress: number) => {
-  const stageMix = clamp(stageFader, 0, 100) / 100 * 0.45;
-  const stressMix = clamp(stress, 0, 100) / 100 * 0.15;
+  const stageMix = (clamp(stageFader, 0, 100) / 100) * 0.45;
+  const stressMix = (clamp(stress, 0, 100) / 100) * 0.15;
   return clamp(0.08 + stageMix + stressMix, 0.06, 0.72);
 };
 
@@ -141,7 +137,9 @@ export interface AdaptiveAudioMixContext {
   overlaysActive: boolean;
 }
 
-export const getAdaptiveAudioBusMultipliers = (context: AdaptiveAudioMixContext): AudioBusLevels => {
+export const getAdaptiveAudioBusMultipliers = (
+  context: AdaptiveAudioMixContext
+): AudioBusLevels => {
   if (!context.isPlaying) {
     return {
       music: 1,
@@ -152,19 +150,19 @@ export const getAdaptiveAudioBusMultipliers = (context: AdaptiveAudioMixContext)
   }
 
   const crisisLoad = clamp(
-    (context.criticalEvents * 0.36) +
-      (context.warningEvents * 0.14) +
-      (clamp(context.stress, 0, 100) / 100 * 0.42) +
+    context.criticalEvents * 0.36 +
+      context.warningEvents * 0.14 +
+      (clamp(context.stress, 0, 100) / 100) * 0.42 +
       (context.overlaysActive ? 0.16 : 0),
     0,
     1
   );
 
   return {
-    music: clamp(1 - (crisisLoad * 0.42), 0.58, 1),
-    sfx: clamp(1 + (crisisLoad * 0.3), 1, 1.3),
-    ui: clamp(1 + (crisisLoad * 0.22), 1, 1.24),
-    crowd: clamp(1 - (crisisLoad * 0.2), 0.78, 1.05)
+    music: clamp(1 - crisisLoad * 0.42, 0.58, 1),
+    sfx: clamp(1 + crisisLoad * 0.3, 1, 1.3),
+    ui: clamp(1 + crisisLoad * 0.22, 1, 1.24),
+    crowd: clamp(1 - crisisLoad * 0.2, 0.78, 1.05)
   };
 };
 
@@ -311,10 +309,7 @@ export const buildScenarioTransitionFrequencies = (
   return [profile.rootHz, profile.rootHz * 2, profile.rootHz * 2.5];
 };
 
-export const buildStateTransitionFrequencies = (
-  from: GameState | null,
-  to: GameState
-) => {
+export const buildStateTransitionFrequencies = (from: GameState | null, to: GameState) => {
   if (to === GameState.PAUSED) return [420, 320];
   if (to === GameState.PLAYING && from === GameState.PAUSED) return [360, 520, 760];
   if (to === GameState.PLAYING) return [330, 495, 660];
@@ -480,7 +475,7 @@ export const useSoundSynth = () => {
   });
   const audioSpatialModeRef = useRef<AudioSpatialMode>('BALANCED');
   const audioBusLevelsRef = useRef<AudioBusLevels>(DEFAULT_AUDIO_BUS_LEVELS);
-  
+
   // Music State
   const tempoRef = useRef(120);
 
@@ -504,43 +499,74 @@ export const useSoundSynth = () => {
   const getResolvedBusLevels = useCallback((): AudioBusLevels => {
     const user = userAudioMixRef.current;
     return normalizeAudioBusLevels({
-      music: baseAudioBusLevelsRef.current.music * adaptiveAudioBusLevelsRef.current.music * user.master * user.music,
-      sfx: baseAudioBusLevelsRef.current.sfx * adaptiveAudioBusLevelsRef.current.sfx * user.master * user.sfx,
-      ui: baseAudioBusLevelsRef.current.ui * adaptiveAudioBusLevelsRef.current.ui * user.master * user.ui,
-      crowd: baseAudioBusLevelsRef.current.crowd * adaptiveAudioBusLevelsRef.current.crowd * user.master * user.crowd
+      music:
+        baseAudioBusLevelsRef.current.music *
+        adaptiveAudioBusLevelsRef.current.music *
+        user.master *
+        user.music,
+      sfx:
+        baseAudioBusLevelsRef.current.sfx *
+        adaptiveAudioBusLevelsRef.current.sfx *
+        user.master *
+        user.sfx,
+      ui:
+        baseAudioBusLevelsRef.current.ui *
+        adaptiveAudioBusLevelsRef.current.ui *
+        user.master *
+        user.ui,
+      crowd:
+        baseAudioBusLevelsRef.current.crowd *
+        adaptiveAudioBusLevelsRef.current.crowd *
+        user.master *
+        user.crowd
     });
   }, []);
 
-  const syncResolvedBusLevels = useCallback((smoothSeconds: number = 0.08) => {
-    const resolved = getResolvedBusLevels();
-    audioBusLevelsRef.current = resolved;
-    applyAudioBusLevels(resolved, smoothSeconds);
-  }, [getResolvedBusLevels]);
+  const syncResolvedBusLevels = useCallback(
+    (smoothSeconds: number = 0.08) => {
+      const resolved = getResolvedBusLevels();
+      audioBusLevelsRef.current = resolved;
+      applyAudioBusLevels(resolved, smoothSeconds);
+    },
+    [getResolvedBusLevels]
+  );
 
-  const setAudioBusLevels = useCallback((levels: Partial<AudioBusLevels>) => {
-    const normalizedBase = normalizeAudioBusLevels(levels, baseAudioBusLevelsRef.current);
-    baseAudioBusLevelsRef.current = normalizedBase;
-    syncResolvedBusLevels();
-  }, [syncResolvedBusLevels]);
+  const setAudioBusLevels = useCallback(
+    (levels: Partial<AudioBusLevels>) => {
+      const normalizedBase = normalizeAudioBusLevels(levels, baseAudioBusLevelsRef.current);
+      baseAudioBusLevelsRef.current = normalizedBase;
+      syncResolvedBusLevels();
+    },
+    [syncResolvedBusLevels]
+  );
 
-  const setGameModeAudioPreset = useCallback((mode: GameMode) => {
-    baseAudioBusLevelsRef.current = getAudioPresetForMode(mode);
-    syncResolvedBusLevels();
-  }, [syncResolvedBusLevels]);
+  const setGameModeAudioPreset = useCallback(
+    (mode: GameMode) => {
+      baseAudioBusLevelsRef.current = getAudioPresetForMode(mode);
+      syncResolvedBusLevels();
+    },
+    [syncResolvedBusLevels]
+  );
 
-  const setUserAudioMix = useCallback((mix: Partial<UserAudioMix>) => {
-    userAudioMixRef.current = normalizeUserAudioMix(mix, userAudioMixRef.current);
-    syncResolvedBusLevels();
-  }, [syncResolvedBusLevels]);
+  const setUserAudioMix = useCallback(
+    (mix: Partial<UserAudioMix>) => {
+      userAudioMixRef.current = normalizeUserAudioMix(mix, userAudioMixRef.current);
+      syncResolvedBusLevels();
+    },
+    [syncResolvedBusLevels]
+  );
 
   const setSpatialAudioMode = useCallback((mode: AudioSpatialMode) => {
     audioSpatialModeRef.current = mode;
   }, []);
 
-  const setAdaptiveAudioMix = useCallback((context: AdaptiveAudioMixContext) => {
-    adaptiveAudioBusLevelsRef.current = getAdaptiveAudioBusMultipliers(context);
-    syncResolvedBusLevels(0.06);
-  }, [syncResolvedBusLevels]);
+  const setAdaptiveAudioMix = useCallback(
+    (context: AdaptiveAudioMixContext) => {
+      adaptiveAudioBusLevelsRef.current = getAdaptiveAudioBusMultipliers(context);
+      syncResolvedBusLevels(0.06);
+    },
+    [syncResolvedBusLevels]
+  );
 
   const setScenarioAudioProfile = useCallback((scenarioId: string) => {
     const profile = getScenarioAudioProfile(scenarioId);
@@ -559,7 +585,7 @@ export const useSoundSynth = () => {
     }
     return curve;
   }, []);
-  
+
   // Helper: Create simple reverb impulse
   const createReverbImpulse = useCallback((ctx: AudioContext) => {
     const length = ctx.sampleRate * 2; // 2 seconds
@@ -577,7 +603,7 @@ export const useSoundSynth = () => {
     if (!audioCtxRef.current) {
       const AudioContextClass = window.AudioContext || (window as any).webkitAudioContext;
       audioCtxRef.current = new AudioContextClass();
-      
+
       masterGainRef.current = audioCtxRef.current.createGain();
       masterGainRef.current.gain.value = 0.4;
       musicBusGainRef.current = audioCtxRef.current.createGain();
@@ -601,29 +627,29 @@ export const useSoundSynth = () => {
       compressorRef.current.ratio.value = 4;
       compressorRef.current.attack.value = 0.003;
       compressorRef.current.release.value = 0.2;
-      
+
       // Global Lowpass Filter (for Sound System Health)
       filterRef.current = audioCtxRef.current.createBiquadFilter();
       filterRef.current.type = 'lowpass';
       filterRef.current.frequency.value = 20000;
-      
+
       // Distortion Node (for CRITICAL sound system)
       distortionRef.current = audioCtxRef.current.createWaveShaper();
       distortionRef.current.curve = createDistortionCurve(0); // Start with no distortion
       distortionRef.current.oversample = '4x';
-      
+
       // Reverb Node (for Stage effects)
       reverbRef.current = audioCtxRef.current.createConvolver();
       if (reverbRef.current) {
         reverbRef.current.buffer = createReverbImpulse(audioCtxRef.current);
       }
-      
+
       // Crowd Noise Gain
       if (!crowdNoiseRef.current) {
         crowdNoiseRef.current = audioCtxRef.current.createGain();
         crowdNoiseRef.current.gain.value = 0;
       }
-      
+
       // Audio Chain:
       // Music sources -> master(dynamic) -> music bus -> distortion -> filter -> dry -> compressor -> destination
       //                                                        -> reverb -> wet -> compressor -> destination
@@ -658,7 +684,7 @@ export const useSoundSynth = () => {
         masterGainRef.current.connect(filterRef.current!);
         filterRef.current!.connect(audioCtxRef.current.destination);
       }
-      
+
       // Crowd noise joins mastering chain when available
       if (crowdNoiseRef.current && crowdBusGainRef.current && compressorRef.current) {
         crowdNoiseRef.current.connect(crowdBusGainRef.current);
@@ -681,23 +707,23 @@ export const useSoundSynth = () => {
     vol: number,
     detune: number = 0
   ) => {
-      if (!audioCtxRef.current || !masterGainRef.current) return;
-      const t = audioCtxRef.current.currentTime;
-      
-      const osc = audioCtxRef.current.createOscillator();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, t);
-      osc.detune.value = detune;
+    if (!audioCtxRef.current || !masterGainRef.current) return;
+    const t = audioCtxRef.current.currentTime;
 
-      const gain = audioCtxRef.current.createGain();
-      gain.gain.setValueAtTime(vol, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + decay);
+    const osc = audioCtxRef.current.createOscillator();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    osc.detune.value = detune;
 
-      osc.connect(gain);
-      gain.connect(masterGainRef.current);
-      
-      osc.start(t);
-      osc.stop(t + decay);
+    const gain = audioCtxRef.current.createGain();
+    gain.gain.setValueAtTime(vol, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + decay);
+
+    osc.connect(gain);
+    gain.connect(masterGainRef.current);
+
+    osc.start(t);
+    osc.stop(t + decay);
   };
 
   const playUiOsc = (
@@ -707,23 +733,23 @@ export const useSoundSynth = () => {
     vol: number,
     detune: number = 0
   ) => {
-      initAudio();
-      if (!audioCtxRef.current || !uiBusGainRef.current) return;
-      const t = audioCtxRef.current.currentTime;
+    initAudio();
+    if (!audioCtxRef.current || !uiBusGainRef.current) return;
+    const t = audioCtxRef.current.currentTime;
 
-      const osc = audioCtxRef.current.createOscillator();
-      osc.type = type;
-      osc.frequency.setValueAtTime(freq, t);
-      osc.detune.value = detune;
+    const osc = audioCtxRef.current.createOscillator();
+    osc.type = type;
+    osc.frequency.setValueAtTime(freq, t);
+    osc.detune.value = detune;
 
-      const gain = audioCtxRef.current.createGain();
-      gain.gain.setValueAtTime(vol, t);
-      gain.gain.exponentialRampToValueAtTime(0.001, t + decay);
+    const gain = audioCtxRef.current.createGain();
+    gain.gain.setValueAtTime(vol, t);
+    gain.gain.exponentialRampToValueAtTime(0.001, t + decay);
 
-      osc.connect(gain);
-      gain.connect(uiBusGainRef.current);
-      osc.start(t);
-      osc.stop(t + decay);
+    osc.connect(gain);
+    gain.connect(uiBusGainRef.current);
+    osc.start(t);
+    osc.stop(t + decay);
   };
 
   const connectSfxNode = (
@@ -732,90 +758,95 @@ export const useSoundSynth = () => {
     variation: number,
     step: number = 0
   ) => {
-      if (!audioCtxRef.current || !sfxBusGainRef.current) return;
-      const pan = getSystemSpatialPan(systemId, audioSpatialModeRef.current, variation, step);
-      const supportsStereoPanner = typeof (audioCtxRef.current as any).createStereoPanner === 'function';
-      if (supportsStereoPanner) {
-        const panner = (audioCtxRef.current as any).createStereoPanner() as StereoPannerNode;
-        panner.pan.setValueAtTime(pan, audioCtxRef.current.currentTime);
-        sourceNode.connect(panner);
-        panner.connect(sfxBusGainRef.current);
-        return;
-      }
-      sourceNode.connect(sfxBusGainRef.current);
+    if (!audioCtxRef.current || !sfxBusGainRef.current) return;
+    const pan = getSystemSpatialPan(systemId, audioSpatialModeRef.current, variation, step);
+    const supportsStereoPanner =
+      typeof (audioCtxRef.current as any).createStereoPanner === 'function';
+    if (supportsStereoPanner) {
+      const panner = (audioCtxRef.current as any).createStereoPanner() as StereoPannerNode;
+      panner.pan.setValueAtTime(pan, audioCtxRef.current.currentTime);
+      sourceNode.connect(panner);
+      panner.connect(sfxBusGainRef.current);
+      return;
+    }
+    sourceNode.connect(sfxBusGainRef.current);
   };
 
   const nextVariation = () => {
-      sfxVariationRef.current = (sfxVariationRef.current + 1) % 9999;
-      return sfxVariationRef.current;
+    sfxVariationRef.current = (sfxVariationRef.current + 1) % 9999;
+    return sfxVariationRef.current;
   };
 
   const playToneSequence = (
-      frequencies: number[],
-      options: {
-        systemId: SystemType;
-        success: boolean;
-        severity: 1 | 2 | 3;
-        variation: number;
-      }
+    frequencies: number[],
+    options: {
+      systemId: SystemType;
+      success: boolean;
+      severity: 1 | 2 | 3;
+      variation: number;
+    }
   ) => {
-      if (!audioCtxRef.current || !sfxBusGainRef.current) return;
-      const start = audioCtxRef.current.currentTime;
-      const { success, severity, systemId, variation } = options;
-      const step = success ? 0.055 : 0.06;
-      const duration = success ? 0.11 : 0.13;
+    if (!audioCtxRef.current || !sfxBusGainRef.current) return;
+    const start = audioCtxRef.current.currentTime;
+    const { success, severity, systemId, variation } = options;
+    const step = success ? 0.055 : 0.06;
+    const duration = success ? 0.11 : 0.13;
 
-      frequencies.forEach((frequency, index) => {
-          const osc = audioCtxRef.current!.createOscillator();
-          osc.type = success
-            ? (index === 0 ? 'triangle' : 'sine')
-            : (index === 0 ? 'square' : 'sawtooth');
-          osc.frequency.setValueAtTime(frequency, start + (index * step));
+    frequencies.forEach((frequency, index) => {
+      const osc = audioCtxRef.current!.createOscillator();
+      osc.type = success
+        ? index === 0
+          ? 'triangle'
+          : 'sine'
+        : index === 0
+          ? 'square'
+          : 'sawtooth';
+      osc.frequency.setValueAtTime(frequency, start + index * step);
 
-          if (!success && severity >= 3) {
-            osc.detune.setValueAtTime(index % 2 === 0 ? 15 : -15, start + (index * step));
-          }
+      if (!success && severity >= 3) {
+        osc.detune.setValueAtTime(index % 2 === 0 ? 15 : -15, start + index * step);
+      }
 
-          const gain = audioCtxRef.current!.createGain();
-          gain.gain.setValueAtTime(success ? 0.11 : 0.15, start + (index * step));
-          gain.gain.exponentialRampToValueAtTime(0.0001, start + (index * step) + duration);
+      const gain = audioCtxRef.current!.createGain();
+      gain.gain.setValueAtTime(success ? 0.11 : 0.15, start + index * step);
+      gain.gain.exponentialRampToValueAtTime(0.0001, start + index * step + duration);
 
-          osc.connect(gain);
-          connectSfxNode(gain, systemId, variation, index);
-          osc.start(start + (index * step));
-          osc.stop(start + (index * step) + duration);
-      });
+      osc.connect(gain);
+      connectSfxNode(gain, systemId, variation, index);
+      osc.start(start + index * step);
+      osc.stop(start + index * step + duration);
+    });
   };
 
   const playNoiseBurst = (intensity: number) => {
-      if (!audioCtxRef.current || !sfxBusGainRef.current) return;
-      const ctx = audioCtxRef.current;
-      const bufferSize = Math.floor(ctx.sampleRate * 0.08);
-      const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        const envelope = Math.pow(1 - i / bufferSize, 2);
-        data[i] = (Math.random() * 2 - 1) * envelope;
-      }
+    if (!audioCtxRef.current || !sfxBusGainRef.current) return;
+    const ctx = audioCtxRef.current;
+    const bufferSize = Math.floor(ctx.sampleRate * 0.08);
+    const buffer = ctx.createBuffer(1, bufferSize, ctx.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      const envelope = Math.pow(1 - i / bufferSize, 2);
+      data[i] = (Math.random() * 2 - 1) * envelope;
+    }
 
-      const source = ctx.createBufferSource();
-      source.buffer = buffer;
+    const source = ctx.createBufferSource();
+    source.buffer = buffer;
 
-      const band = ctx.createBiquadFilter();
-      band.type = 'bandpass';
-      band.frequency.value = 900 + (intensity * 400);
-      band.Q.value = 0.7 + (intensity * 0.8);
+    const band = ctx.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = 900 + intensity * 400;
+    band.Q.value = 0.7 + intensity * 0.8;
 
-      const gain = ctx.createGain();
-      const now = ctx.currentTime;
-      gain.gain.setValueAtTime(0.08 + (intensity * 0.1), now);
-      gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
+    const gain = ctx.createGain();
+    const now = ctx.currentTime;
+    gain.gain.setValueAtTime(0.08 + intensity * 0.1, now);
+    gain.gain.exponentialRampToValueAtTime(0.0001, now + 0.1);
 
-      source.connect(band);
-      band.connect(gain);
-      gain.connect(sfxBusGainRef.current);
-      source.start(now);
-      source.stop(now + 0.11);
+    source.connect(band);
+    band.connect(gain);
+    gain.connect(sfxBusGainRef.current);
+    source.start(now);
+    source.stop(now + 0.11);
   };
 
   const playEventLayers = (
@@ -824,217 +855,219 @@ export const useSoundSynth = () => {
     systemId: SystemType,
     variation: number
   ) => {
-      if (!audioCtxRef.current || !sfxBusGainRef.current) return;
-      const ctx = audioCtxRef.current;
-      const start = ctx.currentTime;
+    if (!audioCtxRef.current || !sfxBusGainRef.current) return;
+    const ctx = audioCtxRef.current;
+    const start = ctx.currentTime;
 
-      preset.layers.forEach((layer) => {
-        const layerStart = start + ((layer.delayMs ?? 0) / 1000);
-        const osc = ctx.createOscillator();
-        osc.type = layer.wave;
-        osc.frequency.setValueAtTime(clamp(baseFrequency * layer.octave, 42, 5200), layerStart);
-        if (layer.detune) {
-          osc.detune.setValueAtTime(layer.detune, layerStart);
-        }
-
-        const gain = ctx.createGain();
-        gain.gain.setValueAtTime(layer.gain, layerStart);
-        gain.gain.exponentialRampToValueAtTime(0.0001, layerStart + layer.decay);
-
-        osc.connect(gain);
-        connectSfxNode(gain, systemId, variation, Math.round(layer.delayMs || 0));
-        osc.start(layerStart);
-        osc.stop(layerStart + layer.decay + 0.03);
-      });
-
-      if (preset.noiseIntensity > 0) {
-        playNoiseBurst(preset.noiseIntensity);
+    preset.layers.forEach((layer) => {
+      const layerStart = start + (layer.delayMs ?? 0) / 1000;
+      const osc = ctx.createOscillator();
+      osc.type = layer.wave;
+      osc.frequency.setValueAtTime(clamp(baseFrequency * layer.octave, 42, 5200), layerStart);
+      if (layer.detune) {
+        osc.detune.setValueAtTime(layer.detune, layerStart);
       }
+
+      const gain = ctx.createGain();
+      gain.gain.setValueAtTime(layer.gain, layerStart);
+      gain.gain.exponentialRampToValueAtTime(0.0001, layerStart + layer.decay);
+
+      osc.connect(gain);
+      connectSfxNode(gain, systemId, variation, Math.round(layer.delayMs || 0));
+      osc.start(layerStart);
+      osc.stop(layerStart + layer.decay + 0.03);
+    });
+
+    if (preset.noiseIntensity > 0) {
+      playNoiseBurst(preset.noiseIntensity);
+    }
   };
 
   const playKick = () => {
-      if (!audioCtxRef.current || !masterGainRef.current) return;
-      const t = audioCtxRef.current.currentTime;
-      
-      const osc = audioCtxRef.current.createOscillator();
-      const gain = audioCtxRef.current.createGain();
-      
-      osc.frequency.setValueAtTime(150, t);
-      osc.frequency.exponentialRampToValueAtTime(40, t + 0.1);
-      
-      gain.gain.setValueAtTime(0.8, t);
-      gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
-      
-      osc.connect(gain);
-      gain.connect(masterGainRef.current);
-      osc.start(t);
-      osc.stop(t + 0.1);
-  }
+    if (!audioCtxRef.current || !masterGainRef.current) return;
+    const t = audioCtxRef.current.currentTime;
+
+    const osc = audioCtxRef.current.createOscillator();
+    const gain = audioCtxRef.current.createGain();
+
+    osc.frequency.setValueAtTime(150, t);
+    osc.frequency.exponentialRampToValueAtTime(40, t + 0.1);
+
+    gain.gain.setValueAtTime(0.8, t);
+    gain.gain.exponentialRampToValueAtTime(0.01, t + 0.1);
+
+    osc.connect(gain);
+    gain.connect(masterGainRef.current);
+    osc.start(t);
+    osc.stop(t + 0.1);
+  };
 
   const playHat = () => {
-      // Noise buffer for HiHat
-      if (!audioCtxRef.current || !masterGainRef.current) return;
-      const bufferSize = audioCtxRef.current.sampleRate * 0.05;
-      const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        data[i] = Math.random() * 2 - 1;
-      }
-      
-      const noise = audioCtxRef.current.createBufferSource();
-      noise.buffer = buffer;
-      const gain = audioCtxRef.current.createGain();
-      gain.gain.value = 0.3;
-      // Bandpass for crisp hat
-      const band = audioCtxRef.current.createBiquadFilter();
-      band.type = 'highpass';
-      band.frequency.value = 6000;
-      
-      noise.connect(band);
-      band.connect(gain);
-      gain.connect(masterGainRef.current);
-      noise.start();
-  }
+    // Noise buffer for HiHat
+    if (!audioCtxRef.current || !masterGainRef.current) return;
+    const bufferSize = audioCtxRef.current.sampleRate * 0.05;
+    const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = Math.random() * 2 - 1;
+    }
+
+    const noise = audioCtxRef.current.createBufferSource();
+    noise.buffer = buffer;
+    const gain = audioCtxRef.current.createGain();
+    gain.gain.value = 0.3;
+    // Bandpass for crisp hat
+    const band = audioCtxRef.current.createBiquadFilter();
+    band.type = 'highpass';
+    band.frequency.value = 6000;
+
+    noise.connect(band);
+    band.connect(gain);
+    gain.connect(masterGainRef.current);
+    noise.start();
+  };
 
   const playClap = () => {
-      if (!audioCtxRef.current || !masterGainRef.current) return;
-      const bufferSize = Math.floor(audioCtxRef.current.sampleRate * 0.12);
-      const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate);
-      const data = buffer.getChannelData(0);
-      for (let i = 0; i < bufferSize; i++) {
-        const envelope = Math.pow(1 - i / bufferSize, 2.5);
-        data[i] = (Math.random() * 2 - 1) * envelope;
-      }
+    if (!audioCtxRef.current || !masterGainRef.current) return;
+    const bufferSize = Math.floor(audioCtxRef.current.sampleRate * 0.12);
+    const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate);
+    const data = buffer.getChannelData(0);
+    for (let i = 0; i < bufferSize; i++) {
+      const envelope = Math.pow(1 - i / bufferSize, 2.5);
+      data[i] = (Math.random() * 2 - 1) * envelope;
+    }
 
-      const source = audioCtxRef.current.createBufferSource();
-      source.buffer = buffer;
-      const band = audioCtxRef.current.createBiquadFilter();
-      band.type = 'bandpass';
-      band.frequency.value = 1800;
-      band.Q.value = 0.9;
+    const source = audioCtxRef.current.createBufferSource();
+    source.buffer = buffer;
+    const band = audioCtxRef.current.createBiquadFilter();
+    band.type = 'bandpass';
+    band.frequency.value = 1800;
+    band.Q.value = 0.9;
 
-      const gain = audioCtxRef.current.createGain();
-      const t = audioCtxRef.current.currentTime;
-      gain.gain.setValueAtTime(0.22, t);
-      gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
+    const gain = audioCtxRef.current.createGain();
+    const t = audioCtxRef.current.currentTime;
+    gain.gain.setValueAtTime(0.22, t);
+    gain.gain.exponentialRampToValueAtTime(0.0001, t + 0.13);
 
-      source.connect(band);
-      band.connect(gain);
-      gain.connect(masterGainRef.current);
-      source.start(t);
-      source.stop(t + 0.14);
+    source.connect(band);
+    band.connect(gain);
+    gain.connect(masterGainRef.current);
+    source.start(t);
+    source.stop(t + 0.14);
   };
 
   const playBass = (note: number) => {
-      playOsc('sawtooth', note, 0.3, 0.4, -10);
-      playOsc('sawtooth', note, 0.3, 0.4, 10); // Super saw-ish
-  }
+    playOsc('sawtooth', note, 0.3, 0.4, -10);
+    playOsc('sawtooth', note, 0.3, 0.4, 10); // Super saw-ish
+  };
 
   const playLead = (note: number) => {
-      playOsc('square', note * 2, 0.1, 0.2);
-  }
+    playOsc('square', note * 2, 0.1, 0.2);
+  };
 
   // PROCEDURAL SEQUENCER
   const startBackgroundLoop = useCallback(() => {
-      initAudio();
-      if (sequencerRef.current) clearInterval(sequencerRef.current);
-      
-      const profile = scenarioProfileRef.current;
-      const bassLine = profile.bassLine;
-      const leadLine = profile.leadLine;
-      tempoRef.current = profile.tempo;
-      const hatStep = profile.hatDensity === 'DENSE' ? 1 : profile.hatDensity === 'SPARSE' ? 4 : 2;
-      
-      sequencerRef.current = window.setInterval(() => {
-          if (!audioCtxRef.current) return;
-          
-          const s = stepRef.current;
-          const stressNow = stressLevelRef.current;
-          const interestNow = interestLevelRef.current;
-          const isHighStress = stressNow > 72;
-          const isVeryHighStress = stressNow > 88;
-          
-          // STEM 1: DRUMS (Always playing unless completely dead)
-          if (s % 4 === 0 || (isVeryHighStress && s % 2 === 0)) playKick();
-          if (s % hatStep === 0 || isHighStress) playHat();
-          if (interestNow > 75 && s % 4 === 2) playClap();
+    initAudio();
+    if (sequencerRef.current) clearInterval(sequencerRef.current);
 
-          // STEM 2: BASS (Cut if low volume)
-          if (masterGainRef.current!.gain.value > 0.1) {
-             if (bassLine[s]) {
-               const detuneRatio = isHighStress && s % 2 === 1
-                 ? (1.04 + (profile.tension * 0.025))
-                 : 1;
-               playBass(bassLine[s] * detuneRatio);
-             }
+    const profile = scenarioProfileRef.current;
+    const bassLine = profile.bassLine;
+    const leadLine = profile.leadLine;
+    tempoRef.current = profile.tempo;
+    const hatStep = profile.hatDensity === 'DENSE' ? 1 : profile.hatDensity === 'SPARSE' ? 4 : 2;
+
+    sequencerRef.current = window.setInterval(
+      () => {
+        if (!audioCtxRef.current) return;
+
+        const s = stepRef.current;
+        const stressNow = stressLevelRef.current;
+        const interestNow = interestLevelRef.current;
+        const isHighStress = stressNow > 72;
+        const isVeryHighStress = stressNow > 88;
+
+        // STEM 1: DRUMS (Always playing unless completely dead)
+        if (s % 4 === 0 || (isVeryHighStress && s % 2 === 0)) playKick();
+        if (s % hatStep === 0 || isHighStress) playHat();
+        if (interestNow > 75 && s % 4 === 2) playClap();
+
+        // STEM 2: BASS (Cut if low volume)
+        if (masterGainRef.current!.gain.value > 0.1) {
+          if (bassLine[s]) {
+            const detuneRatio = isHighStress && s % 2 === 1 ? 1.04 + profile.tension * 0.025 : 1;
+            playBass(bassLine[s] * detuneRatio);
           }
+        }
 
-          // STEM 3: LEAD (Only if high health)
-          if (masterGainRef.current!.gain.value > 0.2) {
-              if (leadLine[s]) {
-                const tensionOffset = isHighStress
-                  ? (s % 2 === 0 ? 24 : -24) * (0.6 + profile.tension * 0.5)
-                  : 0;
-                playLead(leadLine[s] + tensionOffset);
-              }
+        // STEM 3: LEAD (Only if high health)
+        if (masterGainRef.current!.gain.value > 0.2) {
+          if (leadLine[s]) {
+            const tensionOffset = isHighStress
+              ? (s % 2 === 0 ? 24 : -24) * (0.6 + profile.tension * 0.5)
+              : 0;
+            playLead(leadLine[s] + tensionOffset);
           }
+        }
 
-          stepRef.current = (s + 1) % 8;
-      }, (60 / tempoRef.current) * 1000 * 0.5); // 8th notes
-      activeTempoRef.current = tempoRef.current;
+        stepRef.current = (s + 1) % 8;
+      },
+      (60 / tempoRef.current) * 1000 * 0.5
+    ); // 8th notes
+    activeTempoRef.current = tempoRef.current;
   }, [initAudio]);
 
   const stopBackgroundLoop = useCallback(() => {
-      if (sequencerRef.current) {
-          clearInterval(sequencerRef.current);
-          sequencerRef.current = null;
-      }
-      if (crowdSourceRef.current) {
-          crowdSourceRef.current.stop();
-          crowdSourceRef.current = null;
-      }
-      if (crowdNoiseRef.current && audioCtxRef.current) {
-          crowdNoiseRef.current.gain.setTargetAtTime(0, audioCtxRef.current.currentTime, 0.05);
-      }
+    if (sequencerRef.current) {
+      clearInterval(sequencerRef.current);
+      sequencerRef.current = null;
+    }
+    if (crowdSourceRef.current) {
+      crowdSourceRef.current.stop();
+      crowdSourceRef.current = null;
+    }
+    if (crowdNoiseRef.current && audioCtxRef.current) {
+      crowdNoiseRef.current.gain.setTargetAtTime(0, audioCtxRef.current.currentTime, 0.05);
+    }
   }, []);
 
-  const updateBackgroundLoop = useCallback((
-      faderValue: number, 
-      status: string, 
+  const updateBackgroundLoop = useCallback(
+    (
+      faderValue: number,
+      status: string,
       stress: number,
       stageFader?: number,
       publicInterest?: number,
       allSystems?: Record<SystemType, SystemState>
-  ) => {
+    ) => {
       if (!masterGainRef.current || !filterRef.current || !audioCtxRef.current) return;
-      
+
       const now = audioCtxRef.current.currentTime;
       const profile = scenarioProfileRef.current;
       stressLevelRef.current = clamp(stress, 0, 100);
       if (publicInterest !== undefined) {
         interestLevelRef.current = clamp(publicInterest, 0, 100);
       }
-      
+
       // 1. SOUND SYSTEM HEALTH (Filter + Distortion)
       if (status === 'CRITICAL') {
-          // Muffled underwater sound with heavy distortion
-          filterRef.current.frequency.setTargetAtTime(450, now, 0.4); 
-          filterRef.current.Q.value = 9;
-          if (distortionRef.current) {
-              distortionRef.current.curve = createDistortionCurve(45); // Heavy distortion
-          }
+        // Muffled underwater sound with heavy distortion
+        filterRef.current.frequency.setTargetAtTime(450, now, 0.4);
+        filterRef.current.Q.value = 9;
+        if (distortionRef.current) {
+          distortionRef.current.curve = createDistortionCurve(45); // Heavy distortion
+        }
       } else if (status === 'WARNING') {
-          filterRef.current.frequency.setTargetAtTime(2800, now, 0.4);
-          filterRef.current.Q.value = 4;
-          if (distortionRef.current) {
-              distortionRef.current.curve = createDistortionCurve(16); // Light distortion
-          }
+        filterRef.current.frequency.setTargetAtTime(2800, now, 0.4);
+        filterRef.current.Q.value = 4;
+        if (distortionRef.current) {
+          distortionRef.current.curve = createDistortionCurve(16); // Light distortion
+        }
       } else {
-          filterRef.current.frequency.setTargetAtTime(22000, now, 0.5);
-          filterRef.current.Q.value = 1;
-          if (distortionRef.current) {
-              distortionRef.current.curve = createDistortionCurve(0); // No distortion
-          }
+        filterRef.current.frequency.setTargetAtTime(22000, now, 0.5);
+        filterRef.current.Q.value = 1;
+        if (distortionRef.current) {
+          distortionRef.current.curve = createDistortionCurve(0); // No distortion
+        }
       }
 
       // 2. FADER VOLUME + stress ducking
@@ -1043,114 +1076,123 @@ export const useSoundSynth = () => {
 
       // 3. REVERB (Stage + stress)
       if (reverbWetGainRef.current && dryGainRef.current) {
-          const wet = clamp(getReverbWetTarget(stageFader ?? 50, stress) + profile.reverbBias, 0.06, 0.78);
-          const dry = clamp(1 - wet * 0.72, 0.25, 0.95);
-          reverbWetGainRef.current.gain.setTargetAtTime(wet, now, 0.22);
-          dryGainRef.current.gain.setTargetAtTime(dry, now, 0.22);
+        const wet = clamp(
+          getReverbWetTarget(stageFader ?? 50, stress) + profile.reverbBias,
+          0.06,
+          0.78
+        );
+        const dry = clamp(1 - wet * 0.72, 0.25, 0.95);
+        reverbWetGainRef.current.gain.setTargetAtTime(wet, now, 0.22);
+        dryGainRef.current.gain.setTargetAtTime(dry, now, 0.22);
       }
 
       // 4. STRESS = Dissonance and Tempo Variation
       let targetTempo = profile.tempo;
       if (stress > 80) {
-          targetTempo += 10;
+        targetTempo += 10;
       } else if (stress > 55) {
-          targetTempo += 5;
+        targetTempo += 5;
       }
       if (publicInterest !== undefined && publicInterest > 80) {
-          targetTempo += 3;
+        targetTempo += 3;
       } else if (publicInterest !== undefined && publicInterest < 30) {
-          targetTempo -= 2;
+        targetTempo -= 2;
       }
       targetTempo = clamp(targetTempo, 96, 148);
-      if (Math.abs(targetTempo - activeTempoRef.current) >= 4 && Date.now() - lastTempoShiftRef.current > 1500) {
-          tempoRef.current = targetTempo;
-          lastTempoShiftRef.current = Date.now();
-          if (sequencerRef.current) {
-              startBackgroundLoop();
-          }
+      if (
+        Math.abs(targetTempo - activeTempoRef.current) >= 4 &&
+        Date.now() - lastTempoShiftRef.current > 1500
+      ) {
+        tempoRef.current = targetTempo;
+        lastTempoShiftRef.current = Date.now();
+        if (sequencerRef.current) {
+          startBackgroundLoop();
+        }
       }
-      
+
       // 5. CROWD NOISE (Public Interest)
       if (crowdNoiseRef.current && publicInterest !== undefined) {
-          updateCrowdNoise(publicInterest, now);
+        updateCrowdNoise(publicInterest, now);
       }
-      
-  }, []);
-  
+    },
+    []
+  );
+
   const updateCrowdNoise = useCallback((publicInterest: number, now: number) => {
-      if (!audioCtxRef.current || !crowdNoiseRef.current) return;
-      
-      // Crowd noise intensity based on public interest
-      const targetGain = getCrowdNoiseTarget(clamp(publicInterest, 0, 100));
-      
-      crowdNoiseRef.current.gain.setTargetAtTime(targetGain, now, 0.3);
-      
-      // Generate crowd noise if needed
-      if (targetGain > 0.01 && !crowdSourceRef.current) {
-          generateCrowdNoise();
-      } else if (targetGain < 0.01 && crowdSourceRef.current) {
-          crowdSourceRef.current.stop();
-          crowdSourceRef.current = null;
-      }
+    if (!audioCtxRef.current || !crowdNoiseRef.current) return;
+
+    // Crowd noise intensity based on public interest
+    const targetGain = getCrowdNoiseTarget(clamp(publicInterest, 0, 100));
+
+    crowdNoiseRef.current.gain.setTargetAtTime(targetGain, now, 0.3);
+
+    // Generate crowd noise if needed
+    if (targetGain > 0.01 && !crowdSourceRef.current) {
+      generateCrowdNoise();
+    } else if (targetGain < 0.01 && crowdSourceRef.current) {
+      crowdSourceRef.current.stop();
+      crowdSourceRef.current = null;
+    }
   }, []);
-  
+
   const generateCrowdNoise = useCallback(() => {
-      if (!audioCtxRef.current || !crowdNoiseRef.current) return;
-      
-      const bufferSize = audioCtxRef.current.sampleRate * 0.5; // 0.5 seconds
-      const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate);
-      const data = buffer.getChannelData(0);
-      
-      // Create crowd-like noise (filtered white noise)
-      for (let i = 0; i < bufferSize; i++) {
-          data[i] = (Math.random() * 2 - 1) * 0.3;
-      }
-      
-      const source = audioCtxRef.current.createBufferSource();
-      source.buffer = buffer;
-      source.loop = true;
-      
-      // Filter to make it sound more like crowd
-      const filter = audioCtxRef.current.createBiquadFilter();
-      filter.type = 'bandpass';
-      filter.frequency.value = 500;
-      filter.Q.value = 1;
-      
-      source.connect(filter);
-      filter.connect(crowdNoiseRef.current);
-      source.start();
-      
-      crowdSourceRef.current = source;
+    if (!audioCtxRef.current || !crowdNoiseRef.current) return;
+
+    const bufferSize = audioCtxRef.current.sampleRate * 0.5; // 0.5 seconds
+    const buffer = audioCtxRef.current.createBuffer(1, bufferSize, audioCtxRef.current.sampleRate);
+    const data = buffer.getChannelData(0);
+
+    // Create crowd-like noise (filtered white noise)
+    for (let i = 0; i < bufferSize; i++) {
+      data[i] = (Math.random() * 2 - 1) * 0.3;
+    }
+
+    const source = audioCtxRef.current.createBufferSource();
+    source.buffer = buffer;
+    source.loop = true;
+
+    // Filter to make it sound more like crowd
+    const filter = audioCtxRef.current.createBiquadFilter();
+    filter.type = 'bandpass';
+    filter.frequency.value = 500;
+    filter.Q.value = 1;
+
+    source.connect(filter);
+    filter.connect(crowdNoiseRef.current);
+    source.start();
+
+    crowdSourceRef.current = source;
   }, []);
 
   const playClick = useCallback(() => {
-      playUiOsc('sine', 1200, 0.05, 0.1);
+    playUiOsc('sine', 1200, 0.05, 0.1);
   }, []);
 
   const playError = useCallback(() => {
-      playUiOsc('sawtooth', 100, 0.4, 0.38);
-      playUiOsc('square', 90, 0.4, 0.32);
+    playUiOsc('sawtooth', 100, 0.4, 0.38);
+    playUiOsc('square', 90, 0.4, 0.32);
   }, []);
 
   const playSuccess = useCallback(() => {
-      playUiOsc('sine', 880, 0.1, 0.2);
-      setTimeout(() => playUiOsc('sine', 1108, 0.2, 0.2), 100);
+    playUiOsc('sine', 880, 0.1, 0.2);
+    setTimeout(() => playUiOsc('sine', 1108, 0.2, 0.2), 100);
   }, []);
 
   const playAlarm = useCallback(() => {
-      playUiOsc('square', 800, 0.5, 0.26);
-      setTimeout(() => playUiOsc('square', 600, 0.5, 0.24), 200);
+    playUiOsc('square', 800, 0.5, 0.26);
+    setTimeout(() => playUiOsc('square', 600, 0.5, 0.24), 200);
   }, []);
 
   const playStartGame = useCallback((scenarioId?: string) => {
-      const targetScenarioId = scenarioId || scenarioProfileRef.current.id;
-      const frequencies = buildScenarioTransitionFrequencies(targetScenarioId, 'START');
-      playUiOsc('triangle', frequencies[0], 0.9, 0.42);
-      setTimeout(() => playUiOsc('triangle', frequencies[1], 0.9, 0.36), 170);
-      setTimeout(() => playUiOsc('triangle', frequencies[2], 1.4, 0.26), 340);
+    const targetScenarioId = scenarioId || scenarioProfileRef.current.id;
+    const frequencies = buildScenarioTransitionFrequencies(targetScenarioId, 'START');
+    playUiOsc('triangle', frequencies[0], 0.9, 0.42);
+    setTimeout(() => playUiOsc('triangle', frequencies[1], 0.9, 0.36), 170);
+    setTimeout(() => playUiOsc('triangle', frequencies[2], 1.4, 0.26), 340);
   }, []);
 
-  const playScenarioTransitionSfx = useCallback((scenarioId: string, phase: 'LOAD' | 'START' = 'LOAD') => {
+  const playScenarioTransitionSfx = useCallback(
+    (scenarioId: string, phase: 'LOAD' | 'START' = 'LOAD') => {
       setScenarioAudioProfile(scenarioId);
       if (phase === 'START') {
         playStartGame(scenarioId);
@@ -1160,36 +1202,32 @@ export const useSoundSynth = () => {
       playUiOsc('sine', frequencies[0], 0.13, 0.12);
       setTimeout(() => playUiOsc('sine', frequencies[1], 0.14, 0.11), 70);
       setTimeout(() => playUiOsc('triangle', frequencies[2], 0.16, 0.1), 150);
-  }, [playStartGame, setScenarioAudioProfile]);
+    },
+    [playStartGame, setScenarioAudioProfile]
+  );
 
   const playStateTransitionSfx = useCallback((from: GameState | null, to: GameState) => {
-      const frequencies = buildStateTransitionFrequencies(from, to);
-      const wave: OscillatorType =
-        to === GameState.GAME_OVER ? 'sawtooth' :
-        to === GameState.VICTORY ? 'triangle' :
-        to === GameState.PAUSED ? 'square' :
-        'sine';
-      const baseDecay =
-        to === GameState.VICTORY ? 0.22 :
-        to === GameState.GAME_OVER ? 0.2 :
-        0.12;
-      const baseVolume =
-        to === GameState.VICTORY ? 0.16 :
-        to === GameState.GAME_OVER ? 0.15 :
-        0.1;
+    const frequencies = buildStateTransitionFrequencies(from, to);
+    const wave: OscillatorType =
+      to === GameState.GAME_OVER
+        ? 'sawtooth'
+        : to === GameState.VICTORY
+          ? 'triangle'
+          : to === GameState.PAUSED
+            ? 'square'
+            : 'sine';
+    const baseDecay = to === GameState.VICTORY ? 0.22 : to === GameState.GAME_OVER ? 0.2 : 0.12;
+    const baseVolume = to === GameState.VICTORY ? 0.16 : to === GameState.GAME_OVER ? 0.15 : 0.1;
 
-      frequencies.forEach((freq, index) => {
-        setTimeout(() => {
-          playUiOsc(wave, freq, baseDecay + index * 0.03, Math.max(0.08, baseVolume - index * 0.01));
-        }, index * 72);
-      });
+    frequencies.forEach((freq, index) => {
+      setTimeout(() => {
+        playUiOsc(wave, freq, baseDecay + index * 0.03, Math.max(0.08, baseVolume - index * 0.01));
+      }, index * 72);
+    });
   }, []);
 
-  const playEventResolutionSfx = useCallback((params: {
-      systemId: SystemType;
-      success: boolean;
-      severity: 1 | 2 | 3;
-  }) => {
+  const playEventResolutionSfx = useCallback(
+    (params: { systemId: SystemType; success: boolean; severity: 1 | 2 | 3 }) => {
       initAudio();
       const variation = nextVariation();
       const frequencies = buildEventResultSfxPattern(
@@ -1206,12 +1244,12 @@ export const useSoundSynth = () => {
       });
       const layerPreset = getEventSfxLayerPreset(params.success, params.severity);
       playEventLayers(frequencies[0], layerPreset, params.systemId, variation);
-  }, [initAudio]);
+    },
+    [initAudio]
+  );
 
-  const playEventEscalationSfx = useCallback((params: {
-      systemId: SystemType;
-      severity: 1 | 2 | 3;
-  }) => {
+  const playEventEscalationSfx = useCallback(
+    (params: { systemId: SystemType; severity: 1 | 2 | 3 }) => {
       initAudio();
       if (!audioCtxRef.current || !sfxBusGainRef.current) return;
       const variation = nextVariation();
@@ -1221,11 +1259,11 @@ export const useSoundSynth = () => {
       frequencies.forEach((frequency, index) => {
         const osc = audioCtxRef.current!.createOscillator();
         osc.type = 'square';
-        const pulseTime = start + (index * 0.09);
+        const pulseTime = start + index * 0.09;
         osc.frequency.setValueAtTime(frequency, pulseTime);
 
         const gain = audioCtxRef.current!.createGain();
-        gain.gain.setValueAtTime(0.14 + (params.severity * 0.015), pulseTime);
+        gain.gain.setValueAtTime(0.14 + params.severity * 0.015, pulseTime);
         gain.gain.exponentialRampToValueAtTime(0.0001, pulseTime + 0.08);
 
         osc.connect(gain);
@@ -1233,7 +1271,9 @@ export const useSoundSynth = () => {
         osc.start(pulseTime);
         osc.stop(pulseTime + 0.085);
       });
-  }, [initAudio]);
+    },
+    [initAudio]
+  );
 
   return {
     playClick,

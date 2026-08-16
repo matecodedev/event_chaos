@@ -156,13 +156,15 @@ describe('Sound Mix Regressions', () => {
   });
 
   it('keeps neutral adaptive multipliers outside active gameplay', () => {
-    expect(getAdaptiveAudioBusMultipliers({
-      isPlaying: false,
-      criticalEvents: 3,
-      warningEvents: 4,
-      stress: 100,
-      overlaysActive: true
-    })).toEqual({
+    expect(
+      getAdaptiveAudioBusMultipliers({
+        isPlaying: false,
+        criticalEvents: 3,
+        warningEvents: 4,
+        stress: 100,
+        overlaysActive: true
+      })
+    ).toEqual({
       music: 1,
       sfx: 1,
       ui: 1,
@@ -207,6 +209,8 @@ describe('Sound Mix Regressions', () => {
 
     expect(Math.abs(cinematic)).toBeGreaterThan(Math.abs(balanced));
     expect(Math.abs(balanced)).toBeGreaterThan(Math.abs(focus));
-    expect(getAudioSpatialProfile('FOCUS').width).toBeLessThan(getAudioSpatialProfile('CINEMATIC').width);
+    expect(getAudioSpatialProfile('FOCUS').width).toBeLessThan(
+      getAudioSpatialProfile('CINEMATIC').width
+    );
   });
 });

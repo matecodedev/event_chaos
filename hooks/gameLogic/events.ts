@@ -1,7 +1,6 @@
 import { GameMode, SystemType } from '../../types';
-import type { EventDefinition, GameEvent, GameEventOption, GameScenario, SystemState } from '../../types';
+import type { EventDefinition, GameEvent, GameEventOption, GameScenario } from '../../types';
 import { clamp } from './math';
-import type { MatchPhase } from './director';
 
 export const getEventConcurrencyCap = (
   difficulty: GameScenario['difficulty'],
@@ -16,10 +15,13 @@ export const getEventConcurrencyCap = (
   }[difficulty];
 
   const modeDelta =
-    mode === GameMode.HARDCORE ? 1 :
-    mode === GameMode.SPEEDRUN ? 1 :
-    mode === GameMode.ENDLESS ? 0 :
-    0;
+    mode === GameMode.HARDCORE
+      ? 1
+      : mode === GameMode.SPEEDRUN
+        ? 1
+        : mode === GameMode.ENDLESS
+          ? 0
+          : 0;
   const stressDelta = stressLevel >= 80 ? 1 : stressLevel <= 20 ? -1 : 0;
 
   if (difficulty === 'TUTORIAL') return 1;
@@ -39,10 +41,13 @@ export const getStaticEventSeverityChance = (
     EXTREME: 0.7
   }[difficulty];
   const modeDelta =
-    mode === GameMode.HARDCORE ? 0.12 :
-    mode === GameMode.SPEEDRUN ? 0.08 :
-    mode === GameMode.ENDLESS ? -0.04 :
-    0;
+    mode === GameMode.HARDCORE
+      ? 0.12
+      : mode === GameMode.SPEEDRUN
+        ? 0.08
+        : mode === GameMode.ENDLESS
+          ? -0.04
+          : 0;
   const stressDelta = clamp((stressLevel - 50) / 250, -0.12, 0.22);
   const loadDelta = activeEventsCount >= 4 ? -0.06 : activeEventsCount <= 1 ? 0.04 : 0;
 
@@ -63,23 +68,23 @@ export const getStaticEventSpawnDelayMs = (
     EXTREME: 9000
   }[difficulty];
   const modeMultiplier =
-    mode === GameMode.SPEEDRUN ? 0.62 :
-    mode === GameMode.HARDCORE ? 0.72 :
-    mode === GameMode.ENDLESS ? 0.86 :
-    1.0;
+    mode === GameMode.SPEEDRUN
+      ? 0.62
+      : mode === GameMode.HARDCORE
+        ? 0.72
+        : mode === GameMode.ENDLESS
+          ? 0.86
+          : 1.0;
   const stressMultiplier =
-    stressLevel >= 85 ? 0.72 :
-    stressLevel >= 65 ? 0.85 :
-    stressLevel <= 20 ? 1.14 :
-    1.0;
-  const loadMultiplier =
-    activeEventsCount >= 4 ? 1.22 :
-    activeEventsCount <= 1 ? 0.94 :
-    1.0;
+    stressLevel >= 85 ? 0.72 : stressLevel >= 65 ? 0.85 : stressLevel <= 20 ? 1.14 : 1.0;
+  const loadMultiplier = activeEventsCount >= 4 ? 1.22 : activeEventsCount <= 1 ? 0.94 : 1.0;
 
   const normalizedRandom = clamp(randomFactor, 0, 1);
-  const jitter = 0.88 + (normalizedRandom * 0.24);
-  return Math.max(3500, Math.round(baseByDifficulty * modeMultiplier * stressMultiplier * loadMultiplier * jitter));
+  const jitter = 0.88 + normalizedRandom * 0.24;
+  return Math.max(
+    3500,
+    Math.round(baseByDifficulty * modeMultiplier * stressMultiplier * loadMultiplier * jitter)
+  );
 };
 
 export const buildMinigameResolutionOption = (
@@ -101,10 +106,10 @@ export const createEscalatedEvent = (
   now: number,
   idFactory: () => string = () => Math.random().toString(36).slice(2, 11)
 ): GameEvent | null => {
-  const eventDef = systemEvents.find(def => def.title === event.title);
+  const eventDef = systemEvents.find((def) => def.title === event.title);
   if (!eventDef?.escalationEvent) return null;
 
-  const escalationDef = systemEvents.find(def => def.title === eventDef.escalationEvent);
+  const escalationDef = systemEvents.find((def) => def.title === eventDef.escalationEvent);
   if (!escalationDef) return null;
 
   const escalatedSeverity: 1 | 2 | 3 =
@@ -122,7 +127,9 @@ export const createEscalatedEvent = (
     options: escalationDef.options,
     priority: escalationDef.priority || 9,
     canEscalate: escalationDef.canEscalate || false,
-    escalationTime: escalationDef.escalationTime ? now + (escalationDef.escalationTime * 1000) : undefined,
+    escalationTime: escalationDef.escalationTime
+      ? now + escalationDef.escalationTime * 1000
+      : undefined,
     escalatedFrom: event.id,
     relatedEvents: [event.id]
   };
@@ -147,10 +154,10 @@ export const getCrossSystemCascadeTargets = (
   const relatedTitles = new Set(sourceDefinition.relatedTo);
   const targets: CascadeTarget[] = [];
 
-  (Object.values(SystemType) as SystemType[]).forEach(systemId => {
+  (Object.values(SystemType) as SystemType[]).forEach((systemId) => {
     if (systemId === sourceEvent.systemId) return;
     const systemDefinitions = allSystemEvents[systemId] || [];
-    systemDefinitions.forEach(definition => {
+    systemDefinitions.forEach((definition) => {
       if (!relatedTitles.has(definition.title)) return;
       if (activeTitles.has(definition.title)) return;
       if ((eventCooldowns.get(definition.title) || 0) > now) return;
@@ -185,21 +192,26 @@ export const createRelatedCascadeEvent = (
     title: targetDefinition.title,
     description: `${targetDefinition.description} (Impacto en cadena desde: ${sourceEvent.title})`,
     severity,
-    expiresAt: now + (baseDurationSeconds * 1000),
+    expiresAt: now + baseDurationSeconds * 1000,
     correctAction: '',
     options: targetDefinition.options,
     priority: targetDefinition.priority || (severity === 3 ? 9 : severity === 2 ? 6 : 4),
     canEscalate: targetDefinition.canEscalate || false,
-    escalationTime: targetDefinition.escalationTime ? now + (targetDefinition.escalationTime * 1000) : undefined,
+    escalationTime: targetDefinition.escalationTime
+      ? now + targetDefinition.escalationTime * 1000
+      : undefined,
     escalatedFrom: sourceEvent.id,
     relatedEvents: [sourceEvent.id]
   };
 };
 
-export const pickScenarioWeightedEvent = <T extends { allowedScenarios?: string[] }>(events: T[], scenarioId: string): T | null => {
+export const pickScenarioWeightedEvent = <T extends { allowedScenarios?: string[] }>(
+  events: T[],
+  scenarioId: string
+): T | null => {
   if (events.length === 0) return null;
 
-  const weightedPool = events.flatMap(event => {
+  const weightedPool = events.flatMap((event) => {
     const hasDirectScenarioMatch = event.allowedScenarios?.includes(scenarioId);
     const weight = hasDirectScenarioMatch ? 3 : 1;
     return Array.from({ length: weight }, () => event);
@@ -207,4 +219,3 @@ export const pickScenarioWeightedEvent = <T extends { allowedScenarios?: string[
 
   return weightedPool[Math.floor(Math.random() * weightedPool.length)] || events[0];
 };
-

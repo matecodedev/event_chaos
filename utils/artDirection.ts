@@ -343,9 +343,13 @@ export const getArtDirectionCssVariables = ({
   const threat = clamp(threatLevel, 0, 1);
   const motionDamp = reducedMotion ? 0.76 : 1;
 
-  const auroraBoost = clamp((0.66 + (threat * 0.48)) * modeIntensity.aurora * stateDamp * motionDamp, 0.34, 1.4);
-  const panelTopAlpha = clamp(profile.panel.topAlpha * (0.95 + (threat * 0.08)), 0.72, 0.97);
-  const panelBottomAlpha = clamp(profile.panel.bottomAlpha * (0.95 + (threat * 0.06)), 0.68, 0.94);
+  const auroraBoost = clamp(
+    (0.66 + threat * 0.48) * modeIntensity.aurora * stateDamp * motionDamp,
+    0.34,
+    1.4
+  );
+  const panelTopAlpha = clamp(profile.panel.topAlpha * (0.95 + threat * 0.08), 0.72, 0.97);
+  const panelBottomAlpha = clamp(profile.panel.bottomAlpha * (0.95 + threat * 0.06), 0.68, 0.94);
 
   return {
     '--aaa-font-display': profile.typography.display,

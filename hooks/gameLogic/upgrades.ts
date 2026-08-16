@@ -1,5 +1,3 @@
-import { clamp } from './math';
-
 export interface PermanentGameplayModifiers {
   eventTimeMultiplier: number;
   missionTimeMultiplier: number;
@@ -9,7 +7,9 @@ export interface PermanentGameplayModifiers {
   activeEventStressMultiplier: number;
 }
 
-export const getPermanentGameplayModifiers = (unlockedUpgrades: string[]): PermanentGameplayModifiers => {
+export const getPermanentGameplayModifiers = (
+  unlockedUpgrades: string[]
+): PermanentGameplayModifiers => {
   const has = (upgradeId: string) => unlockedUpgrades.includes(upgradeId);
 
   let eventTimeMultiplier = 1.0;
@@ -47,4 +47,3 @@ export const getPermanentGameplayModifiers = (unlockedUpgrades: string[]): Perma
     activeEventStressMultiplier
   };
 };
-

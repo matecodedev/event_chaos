@@ -1,4 +1,3 @@
-
 export enum GameState {
   MENU = 'MENU',
   SHOP = 'SHOP',
@@ -97,14 +96,14 @@ export interface CrewMember {
 }
 
 export interface CareerData {
-    totalCash: number;
-    completedScenarios: string[];
-    highScores: Record<string, number>;
-    // Fase 3: Logros y mejoras
-    unlockedAchievements: string[];
-    unlockedUpgrades: string[];
-    careerPoints: number; // Puntos para desbloquear mejoras
-    reputation: number; // Progreso de carrera para desbloqueos avanzados
+  totalCash: number;
+  completedScenarios: string[];
+  highScores: Record<string, number>;
+  // Fase 3: Logros y mejoras
+  unlockedAchievements: string[];
+  unlockedUpgrades: string[];
+  careerPoints: number; // Puntos para desbloquear mejoras
+  reputation: number; // Progreso de carrera para desbloqueos avanzados
 }
 
 export interface TutorialStep {
@@ -126,49 +125,53 @@ export interface ShopItem {
 
 // --- NEW MISSION TYPES ---
 export interface MissionCriteria {
-    systemId: SystemType;
-    min?: number;
-    max?: number;
+  systemId: SystemType;
+  min?: number;
+  max?: number;
 }
 
 export interface MissionDefinition {
-    id: string;
-    title: string;
-    description: string;
-    criteria: MissionCriteria[];
-    holdDuration: number; // Seconds needed to hold
-    timeout: number; // Seconds to complete
-    rewardCash: number;
-    allowedScenarios?: string[];
+  id: string;
+  title: string;
+  description: string;
+  criteria: MissionCriteria[];
+  holdDuration: number; // Seconds needed to hold
+  timeout: number; // Seconds to complete
+  rewardCash: number;
+  allowedScenarios?: string[];
 }
 
 export interface ActiveMission extends MissionDefinition {
-    startTime: number;
-    expiresAt: number;
-    progress: number; // Seconds held so far
-    isCompleted: boolean;
+  startTime: number;
+  expiresAt: number;
+  progress: number; // Seconds held so far
+  isCompleted: boolean;
 }
 
 // Fase 2: Narrativa emergente
 export interface NarrativeEvent {
-    id: string;
-    type: 'STORY' | 'CHARACTER' | 'CONTEXT';
-    title: string;
-    message: string;
-    character?: string;
-    triggerCondition: (stats: GameStats, systems: Record<SystemType, SystemState>, scenario?: GameScenario) => boolean;
-    cooldown?: number; // Minimum time between same event (ms)
+  id: string;
+  type: 'STORY' | 'CHARACTER' | 'CONTEXT';
+  title: string;
+  message: string;
+  character?: string;
+  triggerCondition: (
+    stats: GameStats,
+    systems: Record<SystemType, SystemState>,
+    scenario?: GameScenario
+  ) => boolean;
+  cooldown?: number; // Minimum time between same event (ms)
 }
 
 // Fase 2: Advertencias tempranas
 export interface EarlyWarning {
-    id: string;
-    systemId: SystemType;
-    message: string;
-    severity: 'LOW' | 'MEDIUM' | 'HIGH';
-    timeUntilEvent: number; // Seconds until event triggers
-    canPrevent: boolean; // Can player prevent this event?
-    preventionAction?: string; // What action prevents it
+  id: string;
+  systemId: SystemType;
+  message: string;
+  severity: 'LOW' | 'MEDIUM' | 'HIGH';
+  timeUntilEvent: number; // Seconds until event triggers
+  canPrevent: boolean; // Can player prevent this event?
+  preventionAction?: string; // What action prevents it
 }
 
 export interface ComboState {
@@ -182,7 +185,7 @@ export const SYSTEM_COLORS = {
   [SystemType.SOUND]: 'text-amber-400 border-amber-400 bg-amber-400/10',
   [SystemType.LIGHTS]: 'text-purple-400 border-purple-400 bg-purple-400/10',
   [SystemType.VIDEO]: 'text-cyan-400 border-cyan-400 bg-cyan-400/10',
-  [SystemType.STAGE]: 'text-rose-400 border-rose-400 bg-rose-400/10',
+  [SystemType.STAGE]: 'text-rose-400 border-rose-400 bg-rose-400/10'
 };
 
 // Fase 3: Sistema de Logros
@@ -192,7 +195,12 @@ export interface Achievement {
   description: string;
   icon: string;
   category: 'PERFORMANCE' | 'ECONOMY' | 'SPEED' | 'PERFECTION' | 'SPECIAL';
-  checkCondition: (stats: GameStats, systems: Record<SystemType, SystemState>, events: GameEvent[], sessionData: SessionData) => boolean;
+  checkCondition: (
+    stats: GameStats,
+    systems: Record<SystemType, SystemState>,
+    events: GameEvent[],
+    sessionData: SessionData
+  ) => boolean;
   rewardPoints: number;
 }
 

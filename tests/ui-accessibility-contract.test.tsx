@@ -1,5 +1,4 @@
 // @vitest-environment jsdom
-import React from 'react';
 import { describe, expect, it, vi } from 'vitest';
 import { render, screen } from '@testing-library/react';
 import userEvent from '@testing-library/user-event';
@@ -39,13 +38,21 @@ describe('Button accessible name', () => {
   });
 
   it('exposes pressed state when asked to', () => {
-    render(<Button onClick={vi.fn()} ariaPressed>Normal</Button>);
-    expect(screen.getByRole('button', { name: 'Normal' }).getAttribute('aria-pressed')).toBe('true');
+    render(
+      <Button onClick={vi.fn()} ariaPressed>
+        Normal
+      </Button>
+    );
+    expect(screen.getByRole('button', { name: 'Normal' }).getAttribute('aria-pressed')).toBe(
+      'true'
+    );
   });
 
   it('does not emit aria-pressed when the button is not a toggle', () => {
     render(<Button onClick={vi.fn()}>Iniciar</Button>);
-    expect(screen.getByRole('button', { name: 'Iniciar' }).hasAttribute('aria-pressed')).toBe(false);
+    expect(screen.getByRole('button', { name: 'Iniciar' }).hasAttribute('aria-pressed')).toBe(
+      false
+    );
   });
 });
 
@@ -62,8 +69,9 @@ describe('ProgressBar semantics', () => {
 
   it('clamps the reported percentage to the 0-100 range', () => {
     render(<ProgressBar value={180} label="Energía" colorClass="text-emerald-400" />);
-    expect(screen.getByRole('progressbar', { name: 'Energía' }).getAttribute('aria-valuetext'))
-      .toBe('100 por ciento');
+    expect(
+      screen.getByRole('progressbar', { name: 'Energía' }).getAttribute('aria-valuetext')
+    ).toBe('100 por ciento');
   });
 
   it('honours a custom max when reporting progress', () => {
@@ -80,9 +88,7 @@ describe('Modal semantics', () => {
     const onClose = vi.fn();
     const user = userEvent.setup();
 
-    render(
-      <AchievementPanel achievements={ACHIEVEMENTS} unlockedIds={[]} onClose={onClose} />
-    );
+    render(<AchievementPanel achievements={ACHIEVEMENTS} unlockedIds={[]} onClose={onClose} />);
 
     const dialog = screen.getByRole('dialog', { name: /LOGROS/i });
     expect(dialog.getAttribute('aria-modal')).toBe('true');
