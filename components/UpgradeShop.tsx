@@ -23,11 +23,16 @@ export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints
 
   return (
     <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center">
-      <div className="bg-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="upgrades-title"
+        className="bg-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+      >
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 className="text-3xl font-bold text-white flex items-center gap-2">
-              <Settings className="w-8 h-8 text-cyan-500" />
+            <h2 id="upgrades-title" className="text-3xl font-bold text-white flex items-center gap-2">
+              <Settings aria-hidden="true" className="w-8 h-8 text-cyan-500" />
               MEJORAS PERMANENTES
             </h2>
             <p className="text-slate-400 text-sm mt-1">
@@ -35,10 +40,12 @@ export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints
             </p>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar mejoras permanentes"
             className="text-slate-400 hover:text-white transition-colors"
           >
-            ✕
+            <span aria-hidden="true">✕</span>
           </button>
         </div>
 

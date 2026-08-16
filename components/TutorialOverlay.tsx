@@ -3,6 +3,7 @@ import React from 'react';
 import { Button } from './Button';
 import { ChevronRight, ShieldCheck } from 'lucide-react';
 import { TutorialStep } from '../types';
+import { getCrewPortraitAsset } from '../utils/artAssets';
 
 interface TutorialOverlayProps {
   step: TutorialStep;
@@ -13,19 +14,28 @@ interface TutorialOverlayProps {
 export const TutorialOverlay: React.FC<TutorialOverlayProps> = ({ step, onNext, totalSteps }) => {
   return (
     <div className="absolute inset-0 z-[100] bg-black/60 backdrop-blur-sm flex items-center justify-center pointer-events-auto">
-        <div className="bg-slate-900 border-2 border-cyan-500 rounded-lg p-8 max-w-lg w-full shadow-[0_0_50px_rgba(6,182,212,0.3)] relative overflow-hidden animate-in zoom-in duration-300">
-            
+        <div
+          role="dialog"
+          aria-modal="true"
+          aria-labelledby="tutorial-title"
+          className="bg-slate-900 border-2 border-cyan-500 rounded-lg p-8 max-w-lg w-full shadow-[0_0_50px_rgba(6,182,212,0.3)] relative overflow-hidden animate-in zoom-in duration-300"
+        >
+
             {/* Background Tech Pattern */}
-            <div className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,0.05)_25%,rgba(6,182,212,0.05)_50%,transparent_50%,transparent_75%,rgba(6,182,212,0.05)_75%,rgba(6,182,212,0.05)_100%)] bg-[length:20px_20px]"></div>
+            <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(45deg,transparent_25%,rgba(6,182,212,0.05)_25%,rgba(6,182,212,0.05)_50%,transparent_50%,transparent_75%,rgba(6,182,212,0.05)_75%,rgba(6,182,212,0.05)_100%)] bg-[length:20px_20px]"></div>
 
             <div className="relative z-10">
                 <div className="flex justify-between items-start mb-6">
                     <div className="flex items-center gap-3">
                          <div className="w-12 h-12 bg-slate-700 rounded-full border-2 border-cyan-400 flex items-center justify-center overflow-hidden">
-                             <img src={`https://api.dicebear.com/7.x/avataaars/svg?seed=Roberto&backgroundColor=b6e3f4`} alt="Jefe" className="w-full h-full" />
+                             <img
+                               src={getCrewPortraitAsset('AUTO')}
+                               alt="Roberto, jefe técnico"
+                               className="w-full h-full object-cover object-top"
+                             />
                          </div>
                          <div>
-                             <h2 className="text-xl font-bold text-white uppercase tracking-wider">{step.title}</h2>
+                             <h2 id="tutorial-title" className="text-xl font-bold text-white uppercase tracking-wider">{step.title}</h2>
                              <span className="text-cyan-400 text-xs font-mono font-bold">ROBERTO (JEFE TÉCNICO)</span>
                          </div>
                     </div>

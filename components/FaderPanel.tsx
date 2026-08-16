@@ -29,6 +29,49 @@ export const FaderPanel: React.FC<FaderPanelProps> = ({ systems, onFaderChange, 
     onFaderChange(id, nextValue);
   };
 
+  // Keyboard control for the fader. Without this the core mechanic of the game
+  // is reachable by pointer only. Steps follow the WAI-ARIA slider pattern.
+  //
+  // The value comes from the current render's props, which is the freshest
+  // source available: several key events dispatched before React re-renders all
+  // read the same value and collapse into one step. Browsers space key repeats
+  // further apart than a frame, so this only shows up in synthetic bursts.
+  const handleFaderKeyDown = (id: SystemType, event: React.KeyboardEvent) => {
+    const STEP = 2;
+    const LARGE_STEP = 10;
+    const currentValue = systems[id].faderValue;
+
+    let nextValue: number | null = null;
+    switch (event.key) {
+      case 'ArrowUp':
+      case 'ArrowRight':
+        nextValue = currentValue + STEP;
+        break;
+      case 'ArrowDown':
+      case 'ArrowLeft':
+        nextValue = currentValue - STEP;
+        break;
+      case 'PageUp':
+        nextValue = currentValue + LARGE_STEP;
+        break;
+      case 'PageDown':
+        nextValue = currentValue - LARGE_STEP;
+        break;
+      case 'Home':
+        nextValue = 0;
+        break;
+      case 'End':
+        nextValue = 100;
+        break;
+      default:
+        return;
+    }
+
+    event.preventDefault();
+    onSelectSystem(id);
+    onFaderChange(id, Math.min(100, Math.max(0, nextValue)));
+  };
+
   const handlePointerDown = (id: SystemType, event: React.PointerEvent<HTMLDivElement>) => {
     event.preventDefault();
     setDraggingId(id);
@@ -63,17 +106,17 @@ export const FaderPanel: React.FC<FaderPanelProps> = ({ systems, onFaderChange, 
 
   return (
     <div className={panelClass}>
-       {!mobile && <div className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.05),transparent_26%,transparent_76%,rgba(34,211,238,0.06))] pointer-events-none rounded-[14px]" />}
-       
+       {!mobile && <div aria-hidden="true" className="absolute inset-0 bg-[linear-gradient(160deg,rgba(255,255,255,0.05),transparent_26%,transparent_76%,rgba(34,211,238,0.06))] pointer-events-none rounded-[14px]" />}
+
        {/* Screw Heads */}
        {!mobile && (
          <>
-           <div className="absolute top-2 left-2 w-3 h-3 rounded-full bg-slate-600/80 flex items-center justify-center"><div className="w-full h-[1px] bg-slate-900/80 rotate-45"></div></div>
-           <div className="absolute top-2 right-2 w-3 h-3 rounded-full bg-slate-600/80 flex items-center justify-center"><div className="w-full h-[1px] bg-slate-900/80 rotate-45"></div></div>
+           <div aria-hidden="true" className="absolute top-2 left-2 w-3 h-3 rounded-full bg-slate-600/80 flex items-center justify-center"><div className="w-full h-[1px] bg-slate-900/80 rotate-45"></div></div>
+           <div aria-hidden="true" className="absolute top-2 right-2 w-3 h-3 rounded-full bg-slate-600/80 flex items-center justify-center"><div className="w-full h-[1px] bg-slate-900/80 rotate-45"></div></div>
          </>
        )}
-       
-       <div className={layoutClass}>
+
+       <div className={layoutClass} role="group" aria-label="Consola de faders">
           {(Object.values(systems) as SystemState[]).map((sys) => {
              const isSafe = sys.faderValue >= 40 && sys.faderValue <= 60;
              const isCritical = sys.faderValue < 20 || sys.faderValue > 80;
@@ -84,15 +127,18 @@ export const FaderPanel: React.FC<FaderPanelProps> = ({ systems, onFaderChange, 
                <div key={sys.id} className={`flex-1 h-full rounded-lg border border-slate-700/70 bg-[linear-gradient(180deg,rgba(7,14,27,0.92),rgba(4,10,20,0.9))] ${mobile ? 'p-1.5' : 'p-2'} flex flex-col items-center relative group shadow-[inset_0_1px_0_rgba(255,255,255,0.05)]`}>
                   
                   {/* Label & Status */}
-                  <div 
+                  <button
+                    type="button"
                     onClick={() => onSelectSystem(sys.id)}
-                    className={`w-full text-center mb-2 font-mono ${mobile ? 'text-[9px]' : 'text-[10px]'} font-bold uppercase py-1 rounded cursor-pointer transition-colors
+                    aria-pressed={selectedSystem === sys.id}
+                    aria-label={`Seleccionar sistema ${sys.name}${isCritical ? ' (en estado crítico)' : ''}`}
+                    className={`w-full text-center mb-2 font-mono ${mobile ? 'text-[9px]' : 'text-[10px]'} font-bold uppercase py-1 rounded cursor-pointer transition-colors focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400
                       ${selectedSystem === sys.id ? 'bg-cyan-900/45 text-cyan-100 border border-cyan-500/40' : 'bg-slate-900/80 text-slate-500 hover:text-slate-300 border border-slate-700/60'}
                     `}
                   >
                      {sys.name}
-                     {isCritical && <AlertCircle className="w-3 h-3 absolute top-2 right-2 text-red-500 animate-pulse" />}
-                  </div>
+                     {isCritical && <AlertCircle aria-hidden="true" className="w-3 h-3 absolute top-2 right-2 text-red-500 animate-pulse" />}
+                  </button>
 
                   {/* Fader Track */}
                   <div
@@ -100,26 +146,37 @@ export const FaderPanel: React.FC<FaderPanelProps> = ({ systems, onFaderChange, 
                     className={`relative flex-1 ${mobile ? 'w-3' : 'w-2'} bg-slate-950/90 rounded-full mb-2 border border-slate-700/70 shadow-inner touch-none`}
                   >
                       {/* Safe Zone Marker */}
-                      <div className="absolute top-[40%] bottom-[40%] left-0 right-0 bg-emerald-500/8 border-y border-emerald-300/10"></div>
-                      
+                      <div aria-hidden="true" className="absolute top-[40%] bottom-[40%] left-0 right-0 bg-emerald-500/8 border-y border-emerald-300/10"></div>
+
                       {/* Center Line */}
-                      <div className="absolute top-1/2 left-[-4px] right-[-4px] h-[1px] bg-cyan-400/30"></div>
+                      <div aria-hidden="true" className="absolute top-1/2 left-[-4px] right-[-4px] h-[1px] bg-cyan-400/30"></div>
 
                       {/* The Fader Cap */}
-                      <div 
+                      <div
+                        role="slider"
+                        tabIndex={0}
+                        aria-label={`Fader de ${sys.name}`}
+                        aria-orientation="vertical"
+                        aria-valuemin={0}
+                        aria-valuemax={100}
+                        aria-valuenow={Math.round(sys.faderValue)}
+                        aria-valuetext={`${Math.round(sys.faderValue)} por ciento, ${
+                          isCritical ? 'zona crítica' : isSafe ? 'zona segura' : 'fuera de la zona segura'
+                        }`}
                         onPointerDown={(event) => handlePointerDown(sys.id, event)}
-                        className={`absolute left-1/2 -translate-x-1/2 ${capSizeClass} rounded shadow-xl cursor-ns-resize flex items-center justify-center transition-transform active:scale-95 touch-none
+                        onKeyDown={(event) => handleFaderKeyDown(sys.id, event)}
+                        className={`absolute left-1/2 -translate-x-1/2 ${capSizeClass} rounded shadow-xl cursor-ns-resize flex items-center justify-center transition-transform active:scale-95 touch-none focus:outline-none focus-visible:ring-2 focus-visible:ring-cyan-400
                            bg-gradient-to-b from-slate-500 to-slate-800 border-t border-slate-300/50 border-b border-black/60
                         `}
                         style={{ bottom: `${sys.faderValue}%`, transform: 'translateX(-50%) translateY(50%)' }}
                       >
-                          <div className={`w-full h-[2px] ${color}`}></div>
-                          <GripHorizontal className="w-4 h-4 text-slate-300 absolute opacity-55" />
+                          <div aria-hidden="true" className={`w-full h-[2px] ${color}`}></div>
+                          <GripHorizontal aria-hidden="true" className="w-4 h-4 text-slate-300 absolute opacity-55" />
                       </div>
                   </div>
 
-                  {/* Value readout */}
-                  <div className={`font-mono ${mobile ? 'text-[11px]' : 'text-xs'} ${isCritical ? 'text-red-400 font-bold animate-pulse' : 'text-slate-300'}`}>
+                  {/* Value readout — already announced through the slider's aria-valuetext */}
+                  <div aria-hidden="true" className={`font-mono ${mobile ? 'text-[11px]' : 'text-xs'} ${isCritical ? 'text-red-400 font-bold animate-pulse' : 'text-slate-300'}`}>
                       {Math.round(sys.faderValue)}%
                   </div>
                </div>

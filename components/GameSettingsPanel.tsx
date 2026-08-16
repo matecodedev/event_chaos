@@ -60,18 +60,22 @@ const SliderRow: React.FC<{
 const OptionPills = <T extends string>({
   options,
   current,
-  onSelect
+  onSelect,
+  groupLabel
 }: {
   options: T[];
   current: T;
   onSelect: (value: T) => void;
+  groupLabel: string;
 }) => {
   return (
-    <div className="grid grid-cols-3 gap-2">
+    <div className="grid grid-cols-3 gap-2" role="group" aria-label={groupLabel}>
       {options.map((option) => (
         <button
           key={option}
+          type="button"
           onClick={() => onSelect(option)}
+          aria-pressed={current === option}
           className={`px-2 py-2 border rounded text-[10px] font-mono uppercase tracking-widest transition-colors ${
             current === option
               ? 'border-cyan-500 bg-cyan-900/30 text-cyan-200'
@@ -108,17 +112,24 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
 
   return (
     <div className="absolute inset-0 z-[130] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
-      <div className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-950/95 shadow-2xl">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="settings-title"
+        className="w-full max-w-3xl max-h-[90vh] overflow-y-auto rounded-xl border border-slate-700 bg-slate-950/95 shadow-2xl"
+      >
         <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-950/95">
           <div className="flex items-center gap-2">
-            <SlidersHorizontal className="w-5 h-5 text-cyan-400" />
-            <h2 className="text-sm font-bold font-mono tracking-[0.2em] text-slate-100 uppercase">Ajustes</h2>
+            <SlidersHorizontal aria-hidden="true" className="w-5 h-5 text-cyan-400" />
+            <h2 id="settings-title" className="text-sm font-bold font-mono tracking-[0.2em] text-slate-100 uppercase">Ajustes</h2>
           </div>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar ajustes"
             className="p-2 rounded border border-slate-700 bg-slate-900 hover:bg-slate-800 text-slate-300"
           >
-            <X className="w-4 h-4" />
+            <X aria-hidden="true" className="w-4 h-4" />
           </button>
         </div>
 
@@ -128,7 +139,7 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
               <Eye className="w-4 h-4 text-cyan-400" />
               Visual
             </div>
-            <OptionPills options={QUALITY_OPTIONS} current={visualQualityMode} onSelect={onVisualQualityChange} />
+            <OptionPills options={QUALITY_OPTIONS} current={visualQualityMode} onSelect={onVisualQualityChange} groupLabel="Calidad visual" />
             <label className="flex items-center justify-between rounded border border-slate-800 bg-slate-900/60 p-3 text-sm text-slate-200">
               <span>Reducir animaciones</span>
               <input
@@ -154,7 +165,7 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
               <AudioLines className="w-4 h-4 text-cyan-400" />
               Audio
             </div>
-            <OptionPills options={SPATIAL_OPTIONS} current={audioSpatialMode} onSelect={onAudioSpatialModeChange} />
+            <OptionPills options={SPATIAL_OPTIONS} current={audioSpatialMode} onSelect={onAudioSpatialModeChange} groupLabel="Modo de audio espacial" />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
               <SliderRow label="Master" value={audioMix.master} onChange={(value) => onAudioMixChange({ master: value })} />
               <SliderRow label="Music" value={audioMix.music} onChange={(value) => onAudioMixChange({ music: value })} />

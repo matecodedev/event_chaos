@@ -44,15 +44,27 @@ export const ClientPopup: React.FC<ClientPopupProps> = ({ message, mood, onClose
   };
 
   return (
-    <div className={`${mobile ? 'relative w-full shrink-0 pointer-events-auto' : 'absolute top-20 md:top-24 left-2 right-2 md:left-auto md:right-8 z-50 md:w-80'} transition-all duration-500 transform ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0'}`}>
-      <div className={`border-l-4 p-4 rounded-r-lg shadow-2xl backdrop-blur-md relative overflow-hidden ${getStyles()}`}>
-        
+    // A dismissed popup keeps its DOM node so it can animate out. Fading it is
+    // not enough: without aria-hidden it stays in the accessibility tree and
+    // its close button stays focusable long after it is visually gone.
+    <div
+      aria-hidden={!isVisible}
+      inert={!isVisible}
+      className={`${mobile ? 'relative w-full shrink-0 pointer-events-auto' : 'absolute top-20 md:top-24 left-2 right-2 md:left-auto md:right-8 z-50 md:w-80'} transition-all duration-500 transform ${isVisible ? 'translate-x-0 opacity-100' : 'translate-x-20 opacity-0 pointer-events-none'}`}
+    >
+      <div
+        role="status"
+        aria-live="polite"
+        aria-label="Mensaje del cliente"
+        className={`border-l-4 p-4 rounded-r-lg shadow-2xl backdrop-blur-md relative overflow-hidden ${getStyles()}`}
+      >
+
         {/* Scanlines overlay specific to popup */}
-        <div className="absolute inset-0 aaa-scanline-overlay pointer-events-none"></div>
+        <div aria-hidden="true" className="absolute inset-0 aaa-scanline-overlay pointer-events-none"></div>
 
         <div className="flex items-start gap-4 relative z-10">
            {/* Client Avatar Placeholder */}
-           <div className="relative">
+           <div aria-hidden="true" className="relative">
               <div className={`w-12 h-12 rounded-lg border-2 bg-black flex items-center justify-center overflow-hidden ${getStyles().split(' ')[0]}`}>
                   <User className={`w-8 h-8 ${getIconColor()}`} />
               </div>
@@ -66,8 +78,13 @@ export const ClientPopup: React.FC<ClientPopupProps> = ({ message, mood, onClose
                   <span className={`text-[10px] font-bold uppercase tracking-widest ${getIconColor()}`}>
                       {mood === 'ANGRY' ? 'CLIENTE (FURIOSO)' : mood === 'HAPPY' ? 'CLIENTE (VIP)' : 'INCOMING MSG'}
                   </span>
-                  <button onClick={() => setIsVisible(false)} className="text-white/50 hover:text-white">
-                      <XCircle className="w-4 h-4" />
+                  <button
+                    type="button"
+                    onClick={() => setIsVisible(false)}
+                    aria-label="Descartar mensaje del cliente"
+                    className="text-white/50 hover:text-white"
+                  >
+                      <XCircle aria-hidden="true" className="w-4 h-4" />
                   </button>
               </div>
               

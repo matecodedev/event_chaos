@@ -342,8 +342,9 @@ export const FXCanvas: React.FC<FXCanvasProps> = ({
   }, [isMobile]);
 
   return (
-    <canvas 
-      ref={canvasRef} 
+    <canvas
+      ref={canvasRef}
+      aria-hidden="true"
       className="absolute inset-0 pointer-events-none z-0"
     />
   );

@@ -26,15 +26,24 @@ export const ProgressBar: React.FC<ProgressBarProps> = ({
         {showValue && <span className={`${colorClass} font-bold text-glow`}>{Math.round(value)}%</span>}
       </div>
       
-      <div className="flex gap-[2px] h-3.5 w-full bg-slate-950/70 p-[2px] border border-slate-700/70 rounded-[6px] shadow-[inset_0_0_10px_rgba(2,6,23,0.8)]">
+      <div
+        role="progressbar"
+        aria-label={label}
+        aria-valuemin={0}
+        aria-valuemax={max}
+        aria-valuenow={Math.round(value)}
+        aria-valuetext={`${Math.round(percentage)} por ciento`}
+        className="flex gap-[2px] h-3.5 w-full bg-slate-950/70 p-[2px] border border-slate-700/70 rounded-[6px] shadow-[inset_0_0_10px_rgba(2,6,23,0.8)]"
+      >
         {[...Array(segments)].map((_, i) => {
             const isActive = i < activeSegments;
             // Opacity gradient for active bars
             const opacity = isActive ? 0.6 + (i / segments) * 0.4 : 0.1;
             
             return (
-                <div 
+                <div
                     key={i}
+                    aria-hidden="true"
                     className={`flex-1 rounded-[2px] transition-all duration-150 ${isActive ? colorClass.replace('text-', 'bg-') : 'bg-slate-700/70'}`}
                     style={{ 
                         opacity: opacity,
