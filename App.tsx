@@ -4,8 +4,7 @@ import { GameMode, GameState, SystemType, SystemState, GameEventOption } from '.
 import { SCENARIOS, TUTORIAL_STEPS, PERMANENT_UPGRADES, WIN_CONDITIONS } from './constants';
 import { useGameLogic } from './hooks/useGameLogic';
 import { useClientAI } from './hooks/useClientAI';
-import { useSoundSynth, DEFAULT_USER_AUDIO_MIX, normalizeUserAudioMix } from './hooks/useSoundSynth';
-import type { AudioSpatialMode, UserAudioMix } from './hooks/useSoundSynth';
+import { useSoundSynth } from './hooks/useSoundSynth';
 import { Button } from './components/Button';
 import { ProgressBar } from './components/ProgressBar';
 import { EventCard } from './components/EventCard';
@@ -33,8 +32,9 @@ import { AchievementPanel } from './components/AchievementPanel';
 import { UpgradeShop } from './components/UpgradeShop';
 import { GameSettingsPanel } from './components/GameSettingsPanel';
 import { computeMobileHudInsets } from './utils/mobileHudLayout';
+import { useUserSettings, VISUAL_QUALITY_LABEL } from './hooks/useUserSettings';
+import { useViewportLayout } from './hooks/useViewportLayout';
 import { getVisualQualityProfile } from './utils/visualPerformance';
-import type { VisualQualityMode } from './utils/visualPerformance';
 import { getCinematicTransitionStyle, getThreatLevel, getThreatRailProfile } from './utils/cinematicFx';
 import { getEventImpactStyle } from './utils/impactFx';
 import type { EventImpactStyle } from './utils/impactFx';
@@ -44,25 +44,6 @@ import { getFxTextureCssVariables, getSceneBackgroundAsset } from './utils/artAs
 import { getMenuToolbarClasses, getMobileOverlayVisibility, sortEventsByUrgency } from './utils/mobileUiPolicy';
 import { getHudCinematicClasses } from './utils/uiCinematics';
 import { Activity, DollarSign, Trophy, AlertOctagon, Users, ZapOff, Frown, Pause, RotateCcw, AlertTriangle, Settings, Home } from 'lucide-react';
-
-const VISUAL_QUALITY_STORAGE_KEY = 'event_chaos_visual_quality_mode';
-const USER_SETTINGS_STORAGE_KEY = 'event_chaos_user_settings_v1';
-const VISUAL_QUALITY_SEQUENCE: VisualQualityMode[] = ['AUTO', 'PERFORMANCE', 'CINEMATIC'];
-const VISUAL_QUALITY_LABEL: Record<VisualQualityMode, string> = {
-  AUTO: 'AUTO',
-  PERFORMANCE: 'PERF',
-  CINEMATIC: 'CINE'
-};
-const AUDIO_SPATIAL_SEQUENCE: AudioSpatialMode[] = ['BALANCED', 'CINEMATIC', 'FOCUS'];
-const DEFAULT_AUDIO_SPATIAL_MODE: AudioSpatialMode = 'BALANCED';
-
-interface StoredUserSettings {
-  visualQualityMode?: VisualQualityMode;
-  reducedMotion?: boolean;
-  highContrastUi?: boolean;
-  audioSpatialMode?: AudioSpatialMode;
-  audioMix?: Partial<UserAudioMix>;
-}
 
 interface ActiveCinematicTransition {
   id: number;
@@ -87,19 +68,6 @@ interface ActiveCameraPunch {
   x: number;
   y: number;
 }
-
-const loadStoredUserSettings = (): StoredUserSettings => {
-  if (typeof window === 'undefined') return {};
-  try {
-    const raw = window.localStorage.getItem(USER_SETTINGS_STORAGE_KEY);
-    if (!raw) return {};
-    const parsed = JSON.parse(raw) as StoredUserSettings;
-    if (!parsed || typeof parsed !== 'object') return {};
-    return parsed;
-  } catch {
-    return {};
-  }
-};
 
 const App: React.FC = () => {
   const { 
@@ -170,47 +138,25 @@ const App: React.FC = () => {
   const [showAchievements, setShowAchievements] = useState(false);
   const [showUpgrades, setShowUpgrades] = useState(false);
   const [showSettings, setShowSettings] = useState(false);
-  const [visualQualityMode, setVisualQualityMode] = useState<VisualQualityMode>(() => {
-    const storedSettings = loadStoredUserSettings();
-    if (storedSettings.visualQualityMode) {
-      return storedSettings.visualQualityMode;
-    }
-    if (typeof window === 'undefined') return 'AUTO';
-    const savedMode = window.localStorage.getItem(VISUAL_QUALITY_STORAGE_KEY);
-    if (savedMode === 'AUTO' || savedMode === 'PERFORMANCE' || savedMode === 'CINEMATIC') {
-      return savedMode;
-    }
-    return 'AUTO';
-  });
-  const [reducedMotion, setReducedMotion] = useState<boolean>(() => {
-    const storedSettings = loadStoredUserSettings();
-    return Boolean(storedSettings.reducedMotion);
-  });
-  const [highContrastUi, setHighContrastUi] = useState<boolean>(() => {
-    const storedSettings = loadStoredUserSettings();
-    return Boolean(storedSettings.highContrastUi);
-  });
-  const [audioSpatialMode, setAudioSpatialMode] = useState<AudioSpatialMode>(() => {
-    const storedSettings = loadStoredUserSettings();
-    const mode = storedSettings.audioSpatialMode;
-    if (mode === 'BALANCED' || mode === 'CINEMATIC' || mode === 'FOCUS') return mode;
-    return DEFAULT_AUDIO_SPATIAL_MODE;
-  });
-  const [audioMix, setAudioMix] = useState<UserAudioMix>(() => {
-    const storedSettings = loadStoredUserSettings();
-    return normalizeUserAudioMix(storedSettings.audioMix || DEFAULT_USER_AUDIO_MIX);
-  });
+  const {
+    visualQualityMode,
+    setVisualQualityMode,
+    reducedMotion,
+    setReducedMotion,
+    highContrastUi,
+    setHighContrastUi,
+    audioSpatialMode,
+    setAudioSpatialMode,
+    audioMix,
+    cycleVisualQuality: selectNextVisualQuality,
+    cycleAudioSpatial: selectNextAudioSpatial,
+    handleAudioMixChange,
+    resetSettings: restoreDefaultSettings
+  } = useUserSettings();
+  const { isMobileLayout, isCompactViewport } = useViewportLayout();
   const [mobileHudInsets, setMobileHudInsets] = useState(() => {
     const viewportHeight = typeof window !== 'undefined' ? window.innerHeight : undefined;
     return computeMobileHudInsets({ headerHeight: 76, faderHeight: 176, viewportHeight });
-  });
-  const [isMobileLayout, setIsMobileLayout] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.matchMedia('(max-width: 1023px)').matches;
-  });
-  const [isCompactViewport, setIsCompactViewport] = useState(() => {
-    if (typeof window === 'undefined') return false;
-    return window.innerWidth < 1380 || window.innerHeight < 900;
   });
   const [activeTransition, setActiveTransition] = useState<ActiveCinematicTransition | null>(null);
   const [activeImpactFx, setActiveImpactFx] = useState<ActiveImpactFx | null>(null);
@@ -225,46 +171,6 @@ const App: React.FC = () => {
   const impactTimeoutRef = useRef<number | null>(null);
   const freezeTimeoutRef = useRef<number | null>(null);
   const punchTimeoutRef = useRef<number | null>(null);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    const mediaQuery = window.matchMedia('(max-width: 1023px)');
-    const onChange = (event: MediaQueryListEvent) => {
-      setIsMobileLayout(event.matches);
-    };
-
-    setIsMobileLayout(mediaQuery.matches);
-    mediaQuery.addEventListener('change', onChange);
-    return () => mediaQuery.removeEventListener('change', onChange);
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-
-    const updateCompactViewport = () => {
-      setIsCompactViewport(window.innerWidth < 1380 || window.innerHeight < 900);
-    };
-
-    updateCompactViewport();
-    window.addEventListener('resize', updateCompactViewport);
-    window.addEventListener('orientationchange', updateCompactViewport);
-    return () => {
-      window.removeEventListener('resize', updateCompactViewport);
-      window.removeEventListener('orientationchange', updateCompactViewport);
-    };
-  }, []);
-
-  useEffect(() => {
-    if (typeof window === 'undefined') return;
-    window.localStorage.setItem(VISUAL_QUALITY_STORAGE_KEY, visualQualityMode);
-    window.localStorage.setItem(USER_SETTINGS_STORAGE_KEY, JSON.stringify({
-      visualQualityMode,
-      reducedMotion,
-      highContrastUi,
-      audioSpatialMode,
-      audioMix
-    }));
-  }, [audioMix, audioSpatialMode, highContrastUi, reducedMotion, visualQualityMode]);
 
   useEffect(() => {
     setScenarioAudioProfile(currentScenario.id);
@@ -666,36 +572,20 @@ const App: React.FC = () => {
     setSelectedSystem(sys);
   };
 
+  // Settings state lives in useUserSettings; announcing the change is the
+  // screen's job, so the cyclers report back which mode they picked.
   const cycleVisualQuality = useCallback(() => {
-    setVisualQualityMode((prevMode) => {
-      const currentIndex = VISUAL_QUALITY_SEQUENCE.indexOf(prevMode);
-      const nextMode = VISUAL_QUALITY_SEQUENCE[(currentIndex + 1) % VISUAL_QUALITY_SEQUENCE.length];
-      addLog(`Visual FX: ${nextMode}`, 'info');
-      return nextMode;
-    });
-  }, []);
+    addLog(`Visual FX: ${selectNextVisualQuality()}`, 'info');
+  }, [addLog, selectNextVisualQuality]);
 
   const cycleAudioSpatial = useCallback(() => {
-    setAudioSpatialMode((prevMode) => {
-      const currentIndex = AUDIO_SPATIAL_SEQUENCE.indexOf(prevMode);
-      const nextMode = AUDIO_SPATIAL_SEQUENCE[(currentIndex + 1) % AUDIO_SPATIAL_SEQUENCE.length];
-      addLog(`Audio Espacial: ${nextMode}`, 'info');
-      return nextMode;
-    });
-  }, []);
-
-  const handleAudioMixChange = useCallback((mix: Partial<UserAudioMix>) => {
-    setAudioMix((prev) => normalizeUserAudioMix(mix, prev));
-  }, []);
+    addLog(`Audio Espacial: ${selectNextAudioSpatial()}`, 'info');
+  }, [addLog, selectNextAudioSpatial]);
 
   const resetSettings = useCallback(() => {
-    setVisualQualityMode('AUTO');
-    setReducedMotion(false);
-    setHighContrastUi(false);
-    setAudioSpatialMode(DEFAULT_AUDIO_SPATIAL_MODE);
-    setAudioMix(DEFAULT_USER_AUDIO_MIX);
+    restoreDefaultSettings();
     addLog('Ajustes restablecidos a valores por defecto', 'warning');
-  }, []);
+  }, [addLog, restoreDefaultSettings]);
   
   const getGameOverReason = () => {
       if (gameState === GameState.VICTORY) return { 
@@ -1220,9 +1110,10 @@ const App: React.FC = () => {
                 <Button
                   onClick={() => { playClick(); setShowSettings(true); }}
                   variant="neutral"
+                  ariaLabel="Abrir ajustes"
                   className="h-12 w-12 flex items-center justify-center !p-0"
                 >
-                    <Settings className="w-5 h-5" />
+                    <Settings aria-hidden="true" className="w-5 h-5" />
                 </Button>
                 <Button
                   onClick={() => { playClick(); cycleVisualQuality(); }}
@@ -1238,8 +1129,13 @@ const App: React.FC = () => {
                 >
                     AUD {audioSpatialMode.slice(0, 4)}
                 </Button>
-                <Button onClick={() => { playClick(); togglePause(); }} variant="neutral" className="h-12 w-12 flex items-center justify-center !p-0">
-                    <Pause className="w-6 h-6" />
+                <Button
+                  onClick={() => { playClick(); togglePause(); }}
+                  variant="neutral"
+                  ariaLabel="Pausar el show"
+                  className="h-12 w-12 flex items-center justify-center !p-0"
+                >
+                    <Pause aria-hidden="true" className="w-6 h-6" />
                 </Button>
             </header>
 
