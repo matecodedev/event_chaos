@@ -24,11 +24,16 @@ export const TerminalLog: React.FC<TerminalLogProps> = ({ logs }) => {
         </div>
 
         {/* Content */}
-        <div className="pt-6 pb-2 h-full overflow-y-auto scrollbar-none space-y-1">
-            <div className="text-slate-500">System boot sequence initiated...</div>
-            <div className="text-slate-500">Loading kernel modules... OK</div>
-            <div className="text-slate-500">Mounting /dev/sda1... OK</div>
-            <div className="text-emerald-500/50">----------------------------------------</div>
+        <div
+          role="log"
+          aria-live="polite"
+          aria-label="Registro del sistema"
+          className="pt-6 pb-2 h-full overflow-y-auto scrollbar-none space-y-1"
+        >
+            <div aria-hidden="true" className="text-slate-500">System boot sequence initiated...</div>
+            <div aria-hidden="true" className="text-slate-500">Loading kernel modules... OK</div>
+            <div aria-hidden="true" className="text-slate-500">Mounting /dev/sda1... OK</div>
+            <div aria-hidden="true" className="text-emerald-500/50">----------------------------------------</div>
             
             {logs.map((log) => (
                 <div key={log.id} className="flex gap-2 font-mono">

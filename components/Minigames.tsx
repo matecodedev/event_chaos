@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import { Button } from './Button';
 import { PlugZap, CheckCircle2, Activity, Wifi } from 'lucide-react';
+import { ART_ASSETS } from '../utils/artAssets';
 
 interface MinigameProps {
   type: 'CABLES' | 'FREQUENCY';
@@ -43,13 +44,18 @@ const CablesMinigame: React.FC<{ onComplete: (success: boolean) => void }> = ({ 
 
   return (
     <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-      <div className="bg-slate-900 border-2 border-slate-600 rounded-lg p-6 shadow-2xl max-w-md w-full relative overflow-hidden">
-        
-        <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
-        
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="minigame-cables-title"
+        className="bg-slate-900 border-2 border-slate-600 rounded-lg p-6 shadow-2xl max-w-md w-full relative overflow-hidden"
+      >
+
+        <div aria-hidden="true" className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+
         <div className="flex justify-between items-center mb-6">
-            <h2 className="text-xl font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                <PlugZap className="text-yellow-400" /> REPARACIÓN MANUAL
+            <h2 id="minigame-cables-title" className="text-xl font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                <PlugZap aria-hidden="true" className="text-yellow-400" /> REPARACIÓN MANUAL
             </h2>
             <div className="text-xs font-mono text-slate-400 animate-pulse">
                 CONECTA LOS CABLES
@@ -147,13 +153,18 @@ const FrequencyMinigame: React.FC<{ onComplete: (success: boolean) => void }> = 
 
     return (
         <div className="absolute inset-0 z-[60] flex items-center justify-center bg-black/80 backdrop-blur-sm">
-            <div className="bg-slate-900 border-2 border-slate-600 rounded-lg p-6 shadow-2xl max-w-md w-full relative overflow-hidden">
-                <div className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
+            <div
+              role="dialog"
+              aria-modal="true"
+              aria-labelledby="minigame-frequency-title"
+              className="bg-slate-900 border-2 border-slate-600 rounded-lg p-6 shadow-2xl max-w-md w-full relative overflow-hidden"
+            >
+                <div aria-hidden="true" className="absolute top-0 left-0 w-full h-1 bg-gradient-to-r from-transparent via-cyan-500 to-transparent"></div>
                  <div className="flex justify-between items-center mb-6">
-                    <h2 className="text-xl font-bold text-white uppercase tracking-widest flex items-center gap-2">
-                        <Activity className="text-cyan-400" /> SINTONIZAR RF
+                    <h2 id="minigame-frequency-title" className="text-xl font-bold text-white uppercase tracking-widest flex items-center gap-2">
+                        <Activity aria-hidden="true" className="text-cyan-400" /> SINTONIZAR RF
                     </h2>
-                    <Wifi className={`w-4 h-4 ${locked ? 'text-green-500' : 'text-slate-500'}`} />
+                    <Wifi aria-hidden="true" className={`w-4 h-4 ${locked ? 'text-green-500' : 'text-slate-500'}`} />
                 </div>
                 
                 <div className="bg-black/50 p-8 rounded-lg border border-slate-800 mb-6 flex flex-col gap-6 items-center justify-center">
@@ -161,7 +172,10 @@ const FrequencyMinigame: React.FC<{ onComplete: (success: boolean) => void }> = 
                     {/* Visualizer Bar */}
                     <div className="w-full h-16 bg-slate-900 rounded border border-slate-700 relative overflow-hidden shadow-inner">
                         {/* Static / Noise Background */}
-                        <div className="absolute inset-0 opacity-20 bg-[url('https://www.transparenttextures.com/patterns/noise.png')]"></div>
+                        <div
+                          className="absolute inset-0 opacity-20 bg-repeat"
+                          style={{ backgroundImage: `url('${ART_ASSETS.fx.noise}')`, backgroundSize: '420px 420px' }}
+                        ></div>
                         
                         {/* Target Zone */}
                         <div 

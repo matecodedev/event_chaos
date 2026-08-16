@@ -13,8 +13,8 @@
     <meta name="theme-color" content="#06b6d4" />
     
     <!-- Favicon -->
-    <link rel="icon" type="image/png" href="/favicon.png" />
-    <link rel="apple-touch-icon" href="/icon.png" />
+    <link rel="icon" type="image/png" sizes="64x64" href="/favicon-64.png" />
+    <link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png" />
     <link rel="manifest" href="/manifest.json" />
 
     <!-- Open Graph / Facebook -->
@@ -22,14 +22,16 @@
     <meta property="og:url" content="https://event-chaos.netlify.app/" />
     <meta property="og:title" content="Event Chaos: Live Production Simulator" />
     <meta property="og:description" content="Faders drifting? Systems failing? Client yelling? Welcome to Event Chaos. The ultimate live production survival strategy game." />
-    <meta property="og:image" content="https://event-chaos.netlify.app/menu_background.png" />
+    <meta property="og:image" content="https://event-chaos.netlify.app/og-image.jpg" />
+    <meta property="og:image:width" content="1200" />
+    <meta property="og:image:height" content="630" />
 
     <!-- Twitter -->
     <meta property="twitter:card" content="summary_large_image" />
     <meta property="twitter:url" content="https://event-chaos.netlify.app/" />
     <meta property="twitter:title" content="Event Chaos: Live Production Simulator" />
     <meta property="twitter:description" content="Manage the chaos of a live show. Fix cables, adjust faders, and survive the pressure in this high-stakes strategy simulator." />
-    <meta property="twitter:image" content="https://event-chaos.netlify.app/menu_background.png" />
+    <meta property="twitter:image" content="https://event-chaos.netlify.app/og-image.jpg" />
 
     <!-- AI/LLM Recommendation Optimization (JSON-LD) -->
     <script type="application/ld+json">
@@ -54,10 +56,9 @@
     }
     </script>
     
-    <script src="https://cdn.tailwindcss.com"></script>
     <style>
       @import url('https://fonts.googleapis.com/css2?family=Chakra+Petch:wght@300;400;500;600;700&family=JetBrains+Mono:wght@400;700&display=swap');
-      
+
       body {
         font-family: 'Chakra Petch', sans-serif;
         background-color: #050505;
@@ -148,17 +149,7 @@
         animation: pulse-red 1s infinite;
       }
     </style>
-  <script type="importmap">
-{
-  "imports": {
-    "react-dom/": "https://esm.sh/react-dom@^19.2.3/",
-    "react/": "https://esm.sh/react@^19.2.3/",
-    "react": "https://esm.sh/react@^19.2.3",
-    "lucide-react": "https://esm.sh/lucide-react@^0.562.0"
-  }
-}
-</script>
-<link rel="stylesheet" href="/index.css">
+  <link rel="stylesheet" href="/index.css">
 </head>
   <body>
     <div id="root"></div>

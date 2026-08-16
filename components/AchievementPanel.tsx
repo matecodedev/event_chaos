@@ -19,17 +19,24 @@ export const AchievementPanel: React.FC<AchievementPanelProps> = ({ achievements
 
   return (
     <div className="absolute inset-0 z-50 bg-black/80 backdrop-blur-sm flex items-center justify-center">
-      <div className="bg-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto">
+      <div
+        role="dialog"
+        aria-modal="true"
+        aria-labelledby="achievements-title"
+        className="bg-slate-900 border-2 border-slate-600 rounded-xl shadow-2xl p-6 max-w-4xl w-full max-h-[90vh] overflow-y-auto"
+      >
         <div className="flex justify-between items-center mb-6">
-          <h2 className="text-3xl font-bold text-white flex items-center gap-2">
-            <Trophy className="w-8 h-8 text-yellow-500" />
+          <h2 id="achievements-title" className="text-3xl font-bold text-white flex items-center gap-2">
+            <Trophy aria-hidden="true" className="w-8 h-8 text-yellow-500" />
             LOGROS
           </h2>
           <button
+            type="button"
             onClick={onClose}
+            aria-label="Cerrar logros"
             className="text-slate-400 hover:text-white transition-colors"
           >
-            ✕
+            <span aria-hidden="true">✕</span>
           </button>
         </div>
 

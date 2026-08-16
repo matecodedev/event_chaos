@@ -4,28 +4,28 @@ const ASSET_ROOT = '/assets/aaa';
 
 export const ART_ASSETS = {
   menu: {
-    desktop: `${ASSET_ROOT}/menu_bg_desktop_v1.jpg`,
-    mobile: `${ASSET_ROOT}/menu_bg_mobile_v1.jpg`
+    desktop: `${ASSET_ROOT}/menu_bg_desktop_v1.webp`,
+    mobile: `${ASSET_ROOT}/menu_bg_mobile_v1.webp`
   },
   gameplay: {
-    desktop: `${ASSET_ROOT}/gameplay_bg_desktop_clean_v1.jpg`,
-    mobile: `${ASSET_ROOT}/gameplay_bg_mobile_clean_v1.jpg`
+    desktop: `${ASSET_ROOT}/gameplay_bg_desktop_clean_v1.webp`,
+    mobile: `${ASSET_ROOT}/gameplay_bg_mobile_clean_v1.webp`
   },
   scenarios: {
-    TUTORIAL: `${ASSET_ROOT}/scenario_tutorial_thumb_v1.jpg`,
-    NORMAL: `${ASSET_ROOT}/scenario_corporativo_thumb_v1.jpg`,
-    ROCKSTAR: `${ASSET_ROOT}/scenario_banda_diva_thumb_v1.jpg`,
-    FESTIVAL: `${ASSET_ROOT}/scenario_festival_thumb_v1.jpg`,
-    EXTREME: `${ASSET_ROOT}/scenario_extremo_thumb_v1.jpg`,
-    ARENA: `${ASSET_ROOT}/scenario_arena_thumb_v1.jpg`,
-    WORLD_TOUR: `${ASSET_ROOT}/scenario_world_tour_thumb_v1.jpg`,
-    BLACKOUT_PROTOCOL: `${ASSET_ROOT}/scenario_blackout_protocol_thumb_v1.jpg`
+    TUTORIAL: `${ASSET_ROOT}/scenario_tutorial_thumb_v1.webp`,
+    NORMAL: `${ASSET_ROOT}/scenario_corporativo_thumb_v1.webp`,
+    ROCKSTAR: `${ASSET_ROOT}/scenario_banda_diva_thumb_v1.webp`,
+    FESTIVAL: `${ASSET_ROOT}/scenario_festival_thumb_v1.webp`,
+    EXTREME: `${ASSET_ROOT}/scenario_extremo_thumb_v1.webp`,
+    ARENA: `${ASSET_ROOT}/scenario_arena_thumb_v1.webp`,
+    WORLD_TOUR: `${ASSET_ROOT}/scenario_world_tour_thumb_v1.webp`,
+    BLACKOUT_PROTOCOL: `${ASSET_ROOT}/scenario_blackout_protocol_thumb_v1.webp`
   } as Record<string, string>,
   crew: {
-    VETERAN: `${ASSET_ROOT}/crew_carlos_v1.png`,
-    BUDGET: `${ASSET_ROOT}/crew_maria_v1.png`,
-    AUTO: `${ASSET_ROOT}/crew_roberto_v1.png`,
-    CALM: `${ASSET_ROOT}/crew_ana_v1.png`
+    VETERAN: `${ASSET_ROOT}/crew_carlos_v1.webp`,
+    BUDGET: `${ASSET_ROOT}/crew_maria_v1.webp`,
+    AUTO: `${ASSET_ROOT}/crew_roberto_v1.webp`,
+    CALM: `${ASSET_ROOT}/crew_ana_v1.webp`
   } as Record<string, string>,
   stage: {
     trussHorizontal: `${ASSET_ROOT}/stage/truss_horizontal_v1.svg`,
@@ -35,10 +35,10 @@ export const ART_ASSETS = {
     ledFrame: `${ASSET_ROOT}/stage/led_wall_frame_v1.svg`
   },
   fx: {
-    noise: `${ASSET_ROOT}/fx_hud_noise_tile_v1.jpg`,
-    scanlines: `${ASSET_ROOT}/fx_scanlines_tile_v1.jpg`,
-    warningChevrons: `${ASSET_ROOT}/fx_warning_chevrons_tile_v1.jpg`,
-    scratches: `${ASSET_ROOT}/fx_glass_micro_scratches_tile_v1.jpg`
+    noise: `${ASSET_ROOT}/fx_hud_noise_tile_v1.webp`,
+    scanlines: `${ASSET_ROOT}/fx_scanlines_tile_v1.webp`,
+    warningChevrons: `${ASSET_ROOT}/fx_warning_chevrons_tile_v1.webp`,
+    scratches: `${ASSET_ROOT}/fx_glass_micro_scratches_tile_v1.webp`
   }
 } as const;
 

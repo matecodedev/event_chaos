@@ -52,11 +52,16 @@ export const GameMenu: React.FC<GameMenuProps> = ({
   if (!scenarios) {
       return (
         <div className="absolute inset-0 z-50 bg-black/75 backdrop-blur-sm flex items-center justify-center px-4">
-          <div className="aaa-panel aaa-panel-strong p-8 max-w-sm w-full text-center relative overflow-hidden">
-            <div className="absolute inset-0 z-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(255,255,255,0.03)_10px,rgba(255,255,255,0.03)_20px)] pointer-events-none opacity-70"></div>
-            
+          <div
+            role="dialog"
+            aria-modal="true"
+            aria-labelledby="pause-title"
+            className="aaa-panel aaa-panel-strong p-8 max-w-sm w-full text-center relative overflow-hidden"
+          >
+            <div aria-hidden="true" className="absolute inset-0 z-0 bg-[repeating-linear-gradient(45deg,transparent,transparent_10px,rgba(255,255,255,0.03)_10px,rgba(255,255,255,0.03)_20px)] pointer-events-none opacity-70"></div>
+
             <div className="relative z-10">
-              <h2 className="text-3xl font-bold text-white mb-2 tracking-widest uppercase text-glow aaa-heading">SISTEMA PAUSADO</h2>
+              <h2 id="pause-title" className="text-3xl font-bold text-white mb-2 tracking-widest uppercase text-glow aaa-heading">SISTEMA PAUSADO</h2>
               <p className="text-slate-200 font-mono text-xs mb-8">ESPERANDO ENTRADA DE USUARIO...</p>
             </div>
 

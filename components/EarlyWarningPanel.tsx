@@ -25,16 +25,21 @@ export const EarlyWarningPanel: React.FC<EarlyWarningPanelProps> = ({
   };
 
   return (
-    <div className={`${mobile ? 'relative w-full shrink-0 space-y-2 pointer-events-auto' : 'absolute top-20 left-2 right-2 md:left-8 md:right-auto z-[100] md:w-80 space-y-2 max-h-[calc(100vh-120px)] overflow-y-auto'}`}>
+    <div
+      role="log"
+      aria-live="assertive"
+      aria-label="Advertencias tempranas"
+      className={`${mobile ? 'relative w-full shrink-0 space-y-2 pointer-events-auto' : 'absolute top-20 left-2 right-2 md:left-8 md:right-auto z-[100] md:w-80 space-y-2 max-h-[calc(100vh-120px)] overflow-y-auto'}`}
+    >
       {visibleWarnings.map(warning => (
         <div
           key={warning.id}
           className={`border-l-4 ${getSeverityColor(warning.severity)} rounded-r-lg p-3 shadow-lg backdrop-blur-sm animate-in slide-in-from-right relative overflow-hidden`}
         >
-          <div className="aaa-warning-chevron-overlay"></div>
+          <div aria-hidden="true" className="aaa-warning-chevron-overlay"></div>
           <div className="relative z-10">
             <div className="flex items-start gap-2 mb-2">
-              <AlertTriangle className={`w-4 h-4 mt-0.5 ${
+              <AlertTriangle aria-hidden="true" className={`w-4 h-4 mt-0.5 ${
                 warning.severity === 'HIGH' ? 'text-red-400' :
                 warning.severity === 'MEDIUM' ? 'text-orange-400' :
                 'text-yellow-400'

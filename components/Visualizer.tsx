@@ -4,6 +4,7 @@ import { SystemType, SystemState } from '../types';
 import { getFrameIntervalMs, getVisualizerTargetFps } from '../utils/visualPerformance';
 import type { VisualQualityMode } from '../utils/visualPerformance';
 import {
+  ART_ASSETS,
   getGameplayBackgroundAsset,
   getStageAsset,
   getStageScenarioVisualAsset
@@ -612,9 +613,14 @@ export const Visualizer: React.FC<VisualizerProps> = ({
 
   return (
     <div className="w-full h-full bg-[#050505] rounded-lg overflow-hidden border border-slate-700 relative shadow-[inset_0_0_50px_rgba(0,0,0,0.9)] group">
-      <canvas ref={canvasRef} className="absolute inset-0 z-10 w-full h-full block" />
+      {/* Purely visual stage render: every value it shows is also exposed by the
+          fader sliders and the HUD progress bars. */}
+      <canvas ref={canvasRef} aria-hidden="true" className="absolute inset-0 z-10 w-full h-full block" />
 
-      <div className="absolute inset-0 bg-[url('https://www.transparenttextures.com/patterns/dust.png')] opacity-20 pointer-events-none z-20" />
+      <div
+        className="absolute inset-0 bg-repeat opacity-20 pointer-events-none z-20"
+        style={{ backgroundImage: `url('${ART_ASSETS.fx.scratches}')`, backgroundSize: '480px 480px' }}
+      />
 
       {renderTechData()}
 
