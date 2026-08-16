@@ -117,6 +117,19 @@ typecheck → lint → format → test → build → bundle budget
 
 `netlify.toml` carries the build command, the SPA redirect, cache headers and the Content-Security-Policy. Hashed build output and versioned art are cached for a year; `index.html` never is.
 
+## License
+
+Code and art are licensed separately.
+
+| What                 | License                              | Short version                                      |
+| -------------------- | ------------------------------------ | -------------------------------------------------- |
+| Source code          | [MIT](LICENSE)                       | Use it, change it, ship it                         |
+| Art and audio design | [CC BY-NC-ND 4.0](ASSETS-LICENSE.md) | Credit required, no commercial use, no derivatives |
+
+Fork it, read it, learn from it — that is what the MIT license is there for. The
+artwork is the part that is not yours to reuse. Want to anyway? Ask at
+[matecode.dev](https://matecode.dev).
+
 ---
 
 Built by [MateCode](https://matecode.dev) — websites and custom software.
