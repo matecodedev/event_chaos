@@ -1,6 +1,6 @@
 # Event Chaos: Live Production Simulator
 
-[![CI](https://github.com/russofg/event_chaos/actions/workflows/ci.yml/badge.svg)](https://github.com/russofg/event_chaos/actions/workflows/ci.yml)
+[![CI](https://github.com/matecodedev/event_chaos/actions/workflows/ci.yml/badge.svg)](https://github.com/matecodedev/event_chaos/actions/workflows/ci.yml)
 
 Web game (desktop + mobile) built with React + Vite.
 
