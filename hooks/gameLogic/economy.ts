@@ -1,5 +1,5 @@
 import { GameMode } from '../../types';
-import type { GameEvent, GameScenario, GameStats, SystemState, SystemType } from '../../types';
+import type { GameEvent, GameScenario, GameStats, SystemState } from '../../types';
 import { clamp } from './math';
 import type { MatchPhase, SessionFatigueMetrics } from './director';
 import type { BossMomentProfile } from './bossMoments';
@@ -84,15 +84,24 @@ export const getPhaseEconomyProfile = (
   const modeDelta = {
     [GameMode.NORMAL]: { mission: 1.0, event: 1.0, failure: 1.0, expiry: 1.0, comeback: 0 },
     [GameMode.ENDLESS]: { mission: 0.98, event: 1.02, failure: 0.98, expiry: 1.0, comeback: 0.02 },
-    [GameMode.SPEEDRUN]: { mission: 1.04, event: 1.08, failure: 1.06, expiry: 1.06, comeback: 0.02 },
+    [GameMode.SPEEDRUN]: {
+      mission: 1.04,
+      event: 1.08,
+      failure: 1.06,
+      expiry: 1.06,
+      comeback: 0.02
+    },
     [GameMode.HARDCORE]: { mission: 1.06, event: 1.1, failure: 1.1, expiry: 1.1, comeback: 0.03 }
   }[mode];
 
   const stressDelta =
-    stressLevel >= 85 ? { mission: 1.04, event: 1.06, failure: 0.9, expiry: 0.9, comeback: 0.07 } :
-    stressLevel >= 70 ? { mission: 1.03, event: 1.04, failure: 0.94, expiry: 0.94, comeback: 0.05 } :
-    stressLevel <= 30 ? { mission: 1.0, event: 1.0, failure: 1.04, expiry: 1.04, comeback: -0.02 } :
-    { mission: 1.0, event: 1.0, failure: 1.0, expiry: 1.0, comeback: 0 };
+    stressLevel >= 85
+      ? { mission: 1.04, event: 1.06, failure: 0.9, expiry: 0.9, comeback: 0.07 }
+      : stressLevel >= 70
+        ? { mission: 1.03, event: 1.04, failure: 0.94, expiry: 0.94, comeback: 0.05 }
+        : stressLevel <= 30
+          ? { mission: 1.0, event: 1.0, failure: 1.04, expiry: 1.04, comeback: -0.02 }
+          : { mission: 1.0, event: 1.0, failure: 1.0, expiry: 1.0, comeback: 0 };
 
   const fatigueDelta =
     fatigueMetrics.fatigueLevel >= 0.8 && fatigueMetrics.pressureLevel <= 0.55
@@ -103,11 +112,51 @@ export const getPhaseEconomyProfile = (
 
   const base = baseByPhase[phase];
   return {
-    missionRewardMultiplier: clamp(base.missionRewardMultiplier * difficultyDelta.mission * modeDelta.mission * stressDelta.mission * fatigueDelta.mission, 0.82, 1.48),
-    eventRewardMultiplier: clamp(base.eventRewardMultiplier * difficultyDelta.event * modeDelta.event * stressDelta.event * fatigueDelta.event, 0.7, 1.65),
-    failurePenaltyMultiplier: clamp(base.failurePenaltyMultiplier * difficultyDelta.failure * modeDelta.failure * stressDelta.failure * fatigueDelta.failure, 0.68, 1.5),
-    expiryPenaltyMultiplier: clamp(base.expiryPenaltyMultiplier * difficultyDelta.expiry * modeDelta.expiry * stressDelta.expiry * fatigueDelta.expiry, 0.64, 1.52),
-    comebackBonusMultiplier: clamp(base.comebackBonusMultiplier + difficultyDelta.comeback + modeDelta.comeback + stressDelta.comeback + fatigueDelta.comeback, 0, 0.36)
+    missionRewardMultiplier: clamp(
+      base.missionRewardMultiplier *
+        difficultyDelta.mission *
+        modeDelta.mission *
+        stressDelta.mission *
+        fatigueDelta.mission,
+      0.82,
+      1.48
+    ),
+    eventRewardMultiplier: clamp(
+      base.eventRewardMultiplier *
+        difficultyDelta.event *
+        modeDelta.event *
+        stressDelta.event *
+        fatigueDelta.event,
+      0.7,
+      1.65
+    ),
+    failurePenaltyMultiplier: clamp(
+      base.failurePenaltyMultiplier *
+        difficultyDelta.failure *
+        modeDelta.failure *
+        stressDelta.failure *
+        fatigueDelta.failure,
+      0.68,
+      1.5
+    ),
+    expiryPenaltyMultiplier: clamp(
+      base.expiryPenaltyMultiplier *
+        difficultyDelta.expiry *
+        modeDelta.expiry *
+        stressDelta.expiry *
+        fatigueDelta.expiry,
+      0.64,
+      1.52
+    ),
+    comebackBonusMultiplier: clamp(
+      base.comebackBonusMultiplier +
+        difficultyDelta.comeback +
+        modeDelta.comeback +
+        stressDelta.comeback +
+        fatigueDelta.comeback,
+      0,
+      0.36
+    )
   };
 };
 
@@ -119,16 +168,36 @@ export const applyBossMomentToEconomyProfile = (
 
   if (bossMoment.active) {
     return {
-      missionRewardMultiplier: clamp(profile.missionRewardMultiplier * (1 + (bossMoment.intensity * 0.08)), 0.82, 1.7),
-      eventRewardMultiplier: clamp(profile.eventRewardMultiplier * (1 + (bossMoment.intensity * 0.1)), 0.7, 1.8),
-      failurePenaltyMultiplier: clamp(profile.failurePenaltyMultiplier * (1 + (bossMoment.intensity * 0.06)), 0.64, 1.6),
-      expiryPenaltyMultiplier: clamp(profile.expiryPenaltyMultiplier * (1 + (bossMoment.intensity * 0.08)), 0.62, 1.65),
+      missionRewardMultiplier: clamp(
+        profile.missionRewardMultiplier * (1 + bossMoment.intensity * 0.08),
+        0.82,
+        1.7
+      ),
+      eventRewardMultiplier: clamp(
+        profile.eventRewardMultiplier * (1 + bossMoment.intensity * 0.1),
+        0.7,
+        1.8
+      ),
+      failurePenaltyMultiplier: clamp(
+        profile.failurePenaltyMultiplier * (1 + bossMoment.intensity * 0.06),
+        0.64,
+        1.6
+      ),
+      expiryPenaltyMultiplier: clamp(
+        profile.expiryPenaltyMultiplier * (1 + bossMoment.intensity * 0.08),
+        0.62,
+        1.65
+      ),
       comebackBonusMultiplier: clamp(profile.comebackBonusMultiplier + 0.04, 0, 0.4)
     };
   }
 
   return {
-    missionRewardMultiplier: clamp(profile.missionRewardMultiplier * (1 + (bossMoment.intensity * 0.05)), 0.82, 1.7),
+    missionRewardMultiplier: clamp(
+      profile.missionRewardMultiplier * (1 + bossMoment.intensity * 0.05),
+      0.82,
+      1.7
+    ),
     eventRewardMultiplier: clamp(profile.eventRewardMultiplier * 0.96, 0.68, 1.8),
     failurePenaltyMultiplier: clamp(profile.failurePenaltyMultiplier * 0.86, 0.62, 1.6),
     expiryPenaltyMultiplier: clamp(profile.expiryPenaltyMultiplier * 0.84, 0.6, 1.65),
@@ -146,11 +215,12 @@ export const getEventResolutionBudgetDelta = (
   streakState: Pick<EconomyStreakState, 'eventSuccessStreak' | 'eventFailStreak'>
 ) => {
   if (isCorrect) {
-    const baseReward = 65 + (severity * 55) + (Math.min(4, activeEventsCount) * 12);
+    const baseReward = 65 + severity * 55 + Math.min(4, activeEventsCount) * 12;
     const streakBonus = Math.min(0.18, streakState.eventSuccessStreak * 0.03);
     const pressureBonus = stats.stress >= 70 ? economyProfile.comebackBonusMultiplier : 0;
     const budgetBonus = stats.budget <= 1200 ? economyProfile.comebackBonusMultiplier * 0.6 : 0;
-    const rewardMultiplier = economyProfile.eventRewardMultiplier * (1 + streakBonus + pressureBonus + budgetBonus);
+    const rewardMultiplier =
+      economyProfile.eventRewardMultiplier * (1 + streakBonus + pressureBonus + budgetBonus);
     const rewardCash = Math.max(0, Math.round(baseReward * rewardMultiplier));
     const netBudgetDelta = rewardCash - cost;
     return {
@@ -160,10 +230,11 @@ export const getEventResolutionBudgetDelta = (
     };
   }
 
-  const basePenalty = (severity * 45) + (Math.min(4, activeEventsCount) * 14);
+  const basePenalty = severity * 45 + Math.min(4, activeEventsCount) * 14;
   const failStreakPenalty = Math.min(0.22, streakState.eventFailStreak * 0.04);
   const pressureRelief = stats.stress >= 80 ? 0.14 : 0;
-  const penaltyMultiplier = economyProfile.failurePenaltyMultiplier * (1 + failStreakPenalty - pressureRelief);
+  const penaltyMultiplier =
+    economyProfile.failurePenaltyMultiplier * (1 + failStreakPenalty - pressureRelief);
   const penaltyCash = Math.max(0, Math.round(basePenalty * penaltyMultiplier));
   const netBudgetDelta = -(cost + penaltyCash);
   return {
@@ -182,7 +253,7 @@ export const getExpiredEventsBudgetPenalty = (
   if (expiredEvents.length === 0) return 0;
 
   const severityWeight = expiredEvents.reduce((sum, event) => sum + event.severity, 0);
-  const basePenalty = (severityWeight * 42) + (Math.min(5, activeEventsCount) * 18);
+  const basePenalty = severityWeight * 42 + Math.min(5, activeEventsCount) * 18;
   const stressRelief = stressLevel >= 85 ? 0.2 : stressLevel >= 70 ? 0.12 : 0;
   const penaltyMultiplier = Math.max(0.6, economyProfile.expiryPenaltyMultiplier - stressRelief);
   return Math.max(0, Math.round(basePenalty * penaltyMultiplier));
@@ -206,13 +277,20 @@ export const getScenarioCompletionRewards = (
     EXTREME: { first: 35, repeat: 12 }
   };
   const modeMultiplier =
-    mode === GameMode.HARDCORE ? 1.25 :
-    mode === GameMode.SPEEDRUN ? 1.15 :
-    mode === GameMode.ENDLESS ? 0.9 :
-    1.0;
+    mode === GameMode.HARDCORE
+      ? 1.25
+      : mode === GameMode.SPEEDRUN
+        ? 1.15
+        : mode === GameMode.ENDLESS
+          ? 0.9
+          : 1.0;
 
-  const basePoints = isFirstTime ? pointsByDifficulty[difficulty].first : pointsByDifficulty[difficulty].repeat;
-  const baseReputation = isFirstTime ? reputationByDifficulty[difficulty].first : reputationByDifficulty[difficulty].repeat;
+  const basePoints = isFirstTime
+    ? pointsByDifficulty[difficulty].first
+    : pointsByDifficulty[difficulty].repeat;
+  const baseReputation = isFirstTime
+    ? reputationByDifficulty[difficulty].first
+    : reputationByDifficulty[difficulty].repeat;
 
   return {
     pointsEarned: Math.max(1, Math.round(basePoints * modeMultiplier)),
@@ -229,16 +307,18 @@ export const calculateScenarioScore = (
   const boundedStress = Math.min(100, Math.max(0, stats.stress));
   const boundedInterest = Math.min(100, Math.max(0, stats.publicInterest));
   const boundedClient = Math.min(100, Math.max(0, stats.clientSatisfaction));
-  const averageSystemHealth = systems.length > 0
-    ? systems.reduce((sum, system) => sum + Math.min(100, Math.max(0, system.health)), 0) / systems.length
-    : 100;
+  const averageSystemHealth =
+    systems.length > 0
+      ? systems.reduce((sum, system) => sum + Math.min(100, Math.max(0, system.health)), 0) /
+        systems.length
+      : 100;
 
   const basePerformance =
-    (boundedInterest * 3) +
-    (boundedClient * 3) +
-    ((100 - boundedStress) * 2) +
-    (averageSystemHealth * 2) +
-    (Math.max(0, stats.budget) / 40);
+    boundedInterest * 3 +
+    boundedClient * 3 +
+    (100 - boundedStress) * 2 +
+    averageSystemHealth * 2 +
+    Math.max(0, stats.budget) / 40;
 
   const difficultyMultiplier = {
     TUTORIAL: 0.6,
@@ -256,4 +336,3 @@ export const calculateScenarioScore = (
 
   return Math.max(1, Math.round(basePerformance * difficultyMultiplier * modeMultiplier));
 };
-

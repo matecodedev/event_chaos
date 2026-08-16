@@ -55,19 +55,18 @@ export const getMobileOverlayVisibility = ({
   const normalizedCenterHeight = Number.isFinite(centerHeight)
     ? Math.max(0, centerHeight as number)
     : undefined;
-  const compactByHeight = typeof normalizedCenterHeight === 'number'
-    ? normalizedCenterHeight < 360
-    : false;
-  const ultraCompactByHeight = typeof normalizedCenterHeight === 'number'
-    ? normalizedCenterHeight < 300
-    : false;
+  const compactByHeight =
+    typeof normalizedCenterHeight === 'number' ? normalizedCenterHeight < 360 : false;
+  const ultraCompactByHeight =
+    typeof normalizedCenterHeight === 'number' ? normalizedCenterHeight < 300 : false;
   const isCompact = isCompactViewport || compactByHeight;
   const isUltraCompact = isCompactViewport && compactByHeight ? true : ultraCompactByHeight;
 
   const showPrimaryEvent = hasPrimaryEvent;
   const showWarnings = warningCount > 0 && (!showPrimaryEvent || !isUltraCompact);
   const showNarrative = hasActiveNarrative && !showPrimaryEvent && (!showWarnings || !isCompact);
-  const showMission = hasActiveMission && !showPrimaryEvent && !showWarnings && (!showNarrative || !isCompact);
+  const showMission =
+    hasActiveMission && !showPrimaryEvent && !showWarnings && (!showNarrative || !isCompact);
   const hasBlockingOverlay = showMission || showPrimaryEvent || showWarnings || showNarrative;
 
   const primaryOverlay: MobileOverlayVisibility['primaryOverlay'] = showPrimaryEvent
@@ -91,7 +90,8 @@ export const getMobileOverlayVisibility = ({
     !showWarnings &&
     !showNarrative &&
     (!hasClientMessage || allowSecondaryPanels);
-  const showSocialFeed = !showPrimaryEvent && !showWarnings && !showNarrative && !hasClientMessage && !showMission;
+  const showSocialFeed =
+    !showPrimaryEvent && !showWarnings && !showNarrative && !hasClientMessage && !showMission;
 
   return {
     primaryOverlay,

@@ -21,17 +21,17 @@ interface DynamicColors {
 export const useDynamicColors = (stats: GameStats, _systems: Record<SystemType, SystemState>) => {
   return useMemo(() => {
     const { publicInterest, clientSatisfaction, stress } = stats;
-    
+
     // Calculate overall energy level (0-100)
     const energyLevel = (publicInterest + clientSatisfaction) / 2;
-    
+
     // Determine game state
     const isCrisis = stress > 70 || publicInterest < 30 || clientSatisfaction < 30;
     const isHighEnergy = energyLevel > 70 && stress < 40;
     const isSuccess = publicInterest > 60 && clientSatisfaction > 60 && stress < 50;
-    
+
     let colors: DynamicColors;
-    
+
     if (isCrisis) {
       // Crisis mode: Cold, desaturated colors
       colors = {
@@ -93,7 +93,7 @@ export const useDynamicColors = (stats: GameStats, _systems: Record<SystemType, 
         textSecondary: 'text-slate-400'
       };
     }
-    
+
     return colors;
   }, [stats]);
 };

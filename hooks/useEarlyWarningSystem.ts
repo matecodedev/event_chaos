@@ -40,11 +40,11 @@ const EARLY_WARNINGS: Omit<EarlyWarning, 'id' | 'timeUntilEvent'>[] = [
   }
 ];
 
-export const useEarlyWarningSystem = ({ 
-  stats, 
-  systems, 
+export const useEarlyWarningSystem = ({
+  stats,
+  systems,
   isPlaying,
-  onPreventEvent 
+  onPreventEvent
 }: UseEarlyWarningSystemProps) => {
   const [activeWarnings, setActiveWarnings] = useState<EarlyWarning[]>([]);
   const warningCooldownsRef = useRef<Map<string, number>>(new Map());
@@ -70,17 +70,18 @@ export const useEarlyWarningSystem = ({
     const now = Date.now();
     const currentSystems = systemsRef.current;
     const soundValue = currentSystems[SystemType.SOUND]?.faderValue || 0;
-    
-    setActiveWarnings(prev => {
+
+    setActiveWarnings((prev) => {
       // Usar el ref para obtener el estado más actualizado
-      const currentWarnings = activeWarningsRef.current.length > 0 ? activeWarningsRef.current : prev;
-      const existingWarningIds = new Set(currentWarnings.map(w => w.id));
+      const currentWarnings =
+        activeWarningsRef.current.length > 0 ? activeWarningsRef.current : prev;
+      const existingWarningIds = new Set(currentWarnings.map((w) => w.id));
       const newWarnings: EarlyWarning[] = [];
 
       // Primero, mantener las advertencias existentes que aún cumplen condiciones
-      currentWarnings.forEach(warning => {
+      currentWarnings.forEach((warning) => {
         let shouldKeep = false;
-        
+
         switch (warning.systemId) {
           case SystemType.SOUND:
             shouldKeep = currentSystems[SystemType.SOUND]?.faderValue > 60;
@@ -91,27 +92,31 @@ export const useEarlyWarningSystem = ({
           case SystemType.VIDEO:
             shouldKeep = currentSystems[SystemType.VIDEO].faderValue > 60;
             break;
-          case SystemType.STAGE:
-            const totalLoad = (Object.values(currentSystems) as SystemState[]).reduce((sum, s) => sum + s.faderValue, 0);
+          case SystemType.STAGE: {
+            const totalLoad = (Object.values(currentSystems) as SystemState[]).reduce(
+              (sum, s) => sum + s.faderValue,
+              0
+            );
             shouldKeep = totalLoad > 200;
             break;
+          }
         }
-        
+
         if (shouldKeep) {
           newWarnings.push(warning);
         }
       });
-      
+
       // Check each warning condition para agregar nuevas
       EARLY_WARNINGS.forEach((warningDef, index) => {
         const warningKey = `${warningDef.systemId}-${index}`;
         const lastTriggered = warningCooldownsRef.current.get(warningKey) || 0;
-        
+
         // Si ya existe, no crear una nueva
         if (existingWarningIds.has(warningKey)) {
           return;
         }
-        
+
         // Cooldown de 5 segundos
         if (now - lastTriggered < 5000) {
           return;
@@ -139,13 +144,17 @@ export const useEarlyWarningSystem = ({
               timeUntilEvent = 30;
             }
             break;
-          case SystemType.STAGE:
-            const totalLoad = (Object.values(currentSystems) as SystemState[]).reduce((sum, s) => sum + s.faderValue, 0);
+          case SystemType.STAGE: {
+            const totalLoad = (Object.values(currentSystems) as SystemState[]).reduce(
+              (sum, s) => sum + s.faderValue,
+              0
+            );
             if (totalLoad > 200) {
               shouldTrigger = true;
               timeUntilEvent = 15;
             }
             break;
+          }
         }
 
         if (shouldTrigger) {
@@ -175,7 +184,7 @@ export const useEarlyWarningSystem = ({
 
     // Check immediately
     checkWarnings();
-    
+
     const interval = setInterval(checkWarnings, 2000); // Check every 2 seconds
     return () => clearInterval(interval);
   }, [checkWarnings, isPlaying]);
@@ -188,12 +197,12 @@ export const useEarlyWarningSystem = ({
       if (activeWarningsRef.current.length === 0) return;
 
       const now = Date.now();
-      setActiveWarnings(prev => {
+      setActiveWarnings((prev) => {
         const currentSystems = systemsRef.current;
-        const filtered = prev.filter(warning => {
+        const filtered = prev.filter((warning) => {
           const createdAt = warningCreatedAtRef.current.get(warning.id) || now;
           const minDisplayTime = 8000; // Mínimo 8 segundos visible (aumentado)
-          
+
           // No eliminar si no ha pasado el tiempo mínimo
           if (now - createdAt < minDisplayTime) {
             return true; // Mantener la advertencia
@@ -212,10 +221,14 @@ export const useEarlyWarningSystem = ({
             case SystemType.VIDEO:
               isPrevented = currentSystems[SystemType.VIDEO].faderValue < 50; // Hysteresis (activación 60%)
               break;
-            case SystemType.STAGE:
-              const totalLoad = (Object.values(currentSystems) as SystemState[]).reduce((sum, s) => sum + s.faderValue, 0);
+            case SystemType.STAGE: {
+              const totalLoad = (Object.values(currentSystems) as SystemState[]).reduce(
+                (sum, s) => sum + s.faderValue,
+                0
+              );
               isPrevented = totalLoad < 160; // Hysteresis: umbral más bajo (activación 200)
               break;
+            }
           }
 
           if (isPrevented && warning.canPrevent && onPreventEvent) {
@@ -242,11 +255,13 @@ export const useEarlyWarningSystem = ({
     const interval = setInterval(() => {
       if (activeWarningsRef.current.length === 0) return;
 
-      setActiveWarnings(prev => {
-        const updated = prev.map(w => ({
-          ...w,
-          timeUntilEvent: Math.max(0, w.timeUntilEvent - 1)
-        })).filter(w => w.timeUntilEvent > 0);
+      setActiveWarnings((prev) => {
+        const updated = prev
+          .map((w) => ({
+            ...w,
+            timeUntilEvent: Math.max(0, w.timeUntilEvent - 1)
+          }))
+          .filter((w) => w.timeUntilEvent > 0);
         // Actualizar el ref
         activeWarningsRef.current = updated;
         return updated;

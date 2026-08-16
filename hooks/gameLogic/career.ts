@@ -3,13 +3,13 @@ import type { CareerData } from '../../types';
 
 export const CAREER_STORAGE_KEY = 'event_chaos_career';
 export const DEFAULT_CAREER: CareerData = {
-    totalCash: 0,
-    completedScenarios: [],
-    highScores: {},
-    unlockedAchievements: [],
-    unlockedUpgrades: [],
-    careerPoints: 0,
-    reputation: 0
+  totalCash: 0,
+  completedScenarios: [],
+  highScores: {},
+  unlockedAchievements: [],
+  unlockedUpgrades: [],
+  careerPoints: 0,
+  reputation: 0
 };
 
 const KNOWN_SCENARIO_IDS = new Set(SCENARIOS.map((scenario) => scenario.id));
@@ -25,7 +25,7 @@ const normalizeStringArray = (value: unknown, allowedIds?: Set<string>): string[
   if (!Array.isArray(value)) return [];
   const normalized = new Set<string>();
 
-  value.forEach(entry => {
+  value.forEach((entry) => {
     if (typeof entry !== 'string') return;
     if (allowedIds && !allowedIds.has(entry)) return;
     normalized.add(entry);
@@ -49,9 +49,10 @@ const normalizeHighScores = (value: unknown): Record<string, number> => {
 };
 
 export const normalizeCareerData = (raw: unknown): CareerData => {
-  const source = raw && typeof raw === 'object' && !Array.isArray(raw)
-    ? (raw as Partial<Record<keyof CareerData, unknown>>)
-    : {};
+  const source =
+    raw && typeof raw === 'object' && !Array.isArray(raw)
+      ? (raw as Partial<Record<keyof CareerData, unknown>>)
+      : {};
 
   return {
     totalCash: getNonNegativeNumber(source.totalCash),

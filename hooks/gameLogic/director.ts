@@ -1,5 +1,5 @@
 import { GameMode } from '../../types';
-import type { GameScenario, GameStats, SystemState, SystemType } from '../../types';
+import type { GameScenario, GameStats } from '../../types';
 import { GAME_DURATION } from '../../constants';
 import { clamp } from './math';
 
@@ -54,9 +54,6 @@ export interface ProceduralInjectionProfile {
   durationMultiplier: number;
 }
 
-
-
-
 export const DEFAULT_SESSION_DIRECTOR_TELEMETRY: SessionDirectorTelemetry = {
   resolvedEvents: 0,
   failedEvents: 0,
@@ -98,7 +95,7 @@ export const getMatchPhase = (
 
   if (!Number.isFinite(totalDuration) || totalDuration <= 0) return 'MIDGAME';
   const clampedRemaining = clamp(timeRemaining, 0, totalDuration);
-  const progress = 1 - (clampedRemaining / totalDuration);
+  const progress = 1 - clampedRemaining / totalDuration;
 
   if (progress < 0.34) return 'OPENING';
   if (progress < 0.78) return 'MIDGAME';
@@ -158,16 +155,37 @@ export const getPhaseDirectorProfile = (
 
   const modeDelta = {
     [GameMode.NORMAL]: { severity: 0, cascade: 0, concurrency: 0, spawn: 1.0, mission: 1.0 },
-    [GameMode.ENDLESS]: { severity: -0.01, cascade: 0.01, concurrency: 0, spawn: 0.96, mission: 0.92 },
-    [GameMode.SPEEDRUN]: { severity: 0.02, cascade: 0.02, concurrency: 0, spawn: 0.88, mission: 0.84 },
-    [GameMode.HARDCORE]: { severity: 0.03, cascade: 0.03, concurrency: 1, spawn: 0.9, mission: 0.86 }
+    [GameMode.ENDLESS]: {
+      severity: -0.01,
+      cascade: 0.01,
+      concurrency: 0,
+      spawn: 0.96,
+      mission: 0.92
+    },
+    [GameMode.SPEEDRUN]: {
+      severity: 0.02,
+      cascade: 0.02,
+      concurrency: 0,
+      spawn: 0.88,
+      mission: 0.84
+    },
+    [GameMode.HARDCORE]: {
+      severity: 0.03,
+      cascade: 0.03,
+      concurrency: 1,
+      spawn: 0.9,
+      mission: 0.86
+    }
   }[mode];
 
   const stressDelta =
-    stressLevel >= 85 ? { severity: 0.04, cascade: 0.06, spawn: 0.9, mission: 0.9 } :
-    stressLevel >= 65 ? { severity: 0.02, cascade: 0.03, spawn: 0.95, mission: 0.95 } :
-    stressLevel <= 20 ? { severity: -0.02, cascade: -0.04, spawn: 1.06, mission: 1.06 } :
-    { severity: 0, cascade: 0, spawn: 1.0, mission: 1.0 };
+    stressLevel >= 85
+      ? { severity: 0.04, cascade: 0.06, spawn: 0.9, mission: 0.9 }
+      : stressLevel >= 65
+        ? { severity: 0.02, cascade: 0.03, spawn: 0.95, mission: 0.95 }
+        : stressLevel <= 20
+          ? { severity: -0.02, cascade: -0.04, spawn: 1.06, mission: 1.06 }
+          : { severity: 0, cascade: 0, spawn: 1.0, mission: 1.0 };
 
   const profile = baseByPhase[phase];
   const cascadeChance = clamp(
@@ -183,7 +201,10 @@ export const getPhaseDirectorProfile = (
       1.28
     ),
     missionRespawnMultiplier: clamp(
-      profile.missionRespawnMultiplier * difficultyDelta.mission * modeDelta.mission * stressDelta.mission,
+      profile.missionRespawnMultiplier *
+        difficultyDelta.mission *
+        modeDelta.mission *
+        stressDelta.mission,
       0.68,
       1.32
     ),
@@ -198,11 +219,9 @@ export const getPhaseDirectorProfile = (
       2
     ),
     cascadeChance,
-    cascadeCooldownMs: Math.round(clamp(
-      profile.cascadeCooldownMs * (1.18 - cascadeChance),
-      6000,
-      22000
-    ))
+    cascadeCooldownMs: Math.round(
+      clamp(profile.cascadeCooldownMs * (1.18 - cascadeChance), 6000, 22000)
+    )
   };
 };
 
@@ -220,10 +239,9 @@ export const getSessionDifficultyTarget = (
   const totalAttempts = totalResolved + totalFailures;
   const successRate = totalAttempts > 0 ? totalResolved / totalAttempts : 0.5;
   const budgetRatio = initialBudget > 0 ? stats.budget / initialBudget : 1;
-  const recentFails = telemetry.recentOutcomes.filter(outcome => outcome === 'FAIL').length;
-  const recentFailPressure = telemetry.recentOutcomes.length > 0
-    ? recentFails / telemetry.recentOutcomes.length
-    : 0;
+  const recentFails = telemetry.recentOutcomes.filter((outcome) => outcome === 'FAIL').length;
+  const recentFailPressure =
+    telemetry.recentOutcomes.length > 0 ? recentFails / telemetry.recentOutcomes.length : 0;
 
   let target = 0;
   target += (successRate - 0.55) * 1.1;
@@ -253,8 +271,8 @@ export const getAdaptiveDirectorAdjustments = (
   const intensity = clamp(difficultyTarget, -1, 1);
 
   return {
-    spawnDelayMultiplier: clamp(1 - (intensity * 0.18), 0.82, 1.22),
-    missionRespawnMultiplier: clamp(1 - (intensity * 0.14), 0.86, 1.2),
+    spawnDelayMultiplier: clamp(1 - intensity * 0.18, 0.82, 1.22),
+    missionRespawnMultiplier: clamp(1 - intensity * 0.14, 0.86, 1.2),
     severityDelta: clamp(intensity * 0.08, -0.1, 0.1),
     concurrencyDelta: intensity >= 0.5 ? 1 : intensity <= -0.5 ? -1 : 0,
     cascadeChanceDelta: clamp(intensity * 0.12, -0.14, 0.14)
@@ -265,11 +283,7 @@ export const composeDirectorProfile = (
   base: PhaseDirectorProfile,
   adjustments: AdaptiveDirectorAdjustments
 ): PhaseDirectorProfile => {
-  const cascadeCooldownMultiplier = clamp(
-    1 - (adjustments.cascadeChanceDelta * 0.72),
-    0.72,
-    1.28
-  );
+  const cascadeCooldownMultiplier = clamp(1 - adjustments.cascadeChanceDelta * 0.72, 0.72, 1.28);
 
   return {
     spawnDelayMultiplier: clamp(
@@ -285,7 +299,9 @@ export const composeDirectorProfile = (
     severityDelta: clamp(base.severityDelta + adjustments.severityDelta, -0.18, 0.24),
     concurrencyDelta: clamp(base.concurrencyDelta + adjustments.concurrencyDelta, -2, 2),
     cascadeChance: clamp(base.cascadeChance + adjustments.cascadeChanceDelta, 0.04, 0.78),
-    cascadeCooldownMs: Math.round(clamp(base.cascadeCooldownMs * cascadeCooldownMultiplier, 5000, 24000))
+    cascadeCooldownMs: Math.round(
+      clamp(base.cascadeCooldownMs * cascadeCooldownMultiplier, 5000, 24000)
+    )
   };
 };
 
@@ -298,33 +314,29 @@ export const getSessionFatigueMetrics = (
   activeEventsCount: number
 ): SessionFatigueMetrics => {
   const attempts = telemetry.resolvedEvents + telemetry.failedEvents + telemetry.expiredEvents;
-  const recentFailRate = telemetry.recentOutcomes.length > 0
-    ? telemetry.recentOutcomes.filter(outcome => outcome === 'FAIL').length / telemetry.recentOutcomes.length
-    : 0;
+  const recentFailRate =
+    telemetry.recentOutcomes.length > 0
+      ? telemetry.recentOutcomes.filter((outcome) => outcome === 'FAIL').length /
+        telemetry.recentOutcomes.length
+      : 0;
 
-  const progressRatio = mode === GameMode.ENDLESS
-    ? clamp(attempts / 40, 0, 1)
-    : totalDuration > 0
-      ? clamp(1 - (timeRemaining / totalDuration), 0, 1)
-      : 0.5;
+  const progressRatio =
+    mode === GameMode.ENDLESS
+      ? clamp(attempts / 40, 0, 1)
+      : totalDuration > 0
+        ? clamp(1 - timeRemaining / totalDuration, 0, 1)
+        : 0.5;
 
   const stressPressure = clamp((stats.stress - 45) / 55, 0, 1);
   const loadPressure = clamp((activeEventsCount - 2) / 4, 0, 1);
   const failPressure = clamp(recentFailRate, 0, 1);
   const pressureLevel = clamp(
-    (stressPressure * 0.54) +
-    (loadPressure * 0.3) +
-    (failPressure * 0.16),
+    stressPressure * 0.54 + loadPressure * 0.3 + failPressure * 0.16,
     0,
     1
   );
 
-  const fatigueLevel = clamp(
-    (progressRatio * 0.56) +
-    (pressureLevel * 0.44),
-    0,
-    1
-  );
+  const fatigueLevel = clamp(progressRatio * 0.56 + pressureLevel * 0.44, 0, 1);
 
   return {
     progressRatio,
@@ -367,7 +379,8 @@ export const getProceduralInjectionProfile = (
   const overloadSuppression = metrics.pressureLevel >= 0.74 || metrics.recentFailRate >= 0.62;
   const climaxBoost = metrics.fatigueLevel >= 0.72 && metrics.pressureLevel <= 0.52;
   const loadPenalty = activeEventsCount >= 4 ? 0.14 : activeEventsCount >= 3 ? 0.08 : 0;
-  const progressBoost = metrics.progressRatio >= 0.8 ? 0.06 : metrics.progressRatio >= 0.6 ? 0.03 : 0;
+  const progressBoost =
+    metrics.progressRatio >= 0.8 ? 0.06 : metrics.progressRatio >= 0.6 ? 0.03 : 0;
 
   let aiChanceMultiplier = difficultyAggression * modeAggression;
   let aiCooldownMultiplier = 1.0;
@@ -399,10 +412,10 @@ export const getProceduralInjectionProfile = (
   }
 
   aiChanceMultiplier = clamp(aiChanceMultiplier + progressBoost - loadPenalty, 0.56, 1.34);
-  aiCooldownMultiplier = clamp(aiCooldownMultiplier + (loadPenalty * 0.8), 0.78, 1.5);
+  aiCooldownMultiplier = clamp(aiCooldownMultiplier + loadPenalty * 0.8, 0.78, 1.5);
   severityBias = clamp(severityBias, -0.24, 0.22);
-  durationMultiplier = clamp(durationMultiplier + (loadPenalty * 0.4), 0.86, 1.28);
-  idleRetryDelayMs = Math.round(clamp(idleRetryDelayMs + (loadPenalty * 2200), 5500, 13000));
+  durationMultiplier = clamp(durationMultiplier + loadPenalty * 0.4, 0.86, 1.28);
+  idleRetryDelayMs = Math.round(clamp(idleRetryDelayMs + loadPenalty * 2200, 5500, 13000));
 
   return {
     aiChanceMultiplier,
@@ -413,4 +426,3 @@ export const getProceduralInjectionProfile = (
     durationMultiplier
   };
 };
-

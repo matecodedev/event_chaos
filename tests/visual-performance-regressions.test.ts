@@ -16,8 +16,12 @@ describe('Visual Performance Regressions', () => {
     expect(getVisualizerTargetFps(false, 20, 'AUTO')).toBe(60);
     expect(getVisualizerTargetFps(false, 70, 'AUTO')).toBe(52);
     expect(getVisualizerTargetFps(false, 95, 'AUTO')).toBe(45);
-    expect(getVisualizerTargetFps(false, 70, 'PERFORMANCE')).toBeGreaterThan(getVisualizerTargetFps(false, 70, 'AUTO'));
-    expect(getVisualizerTargetFps(false, 70, 'CINEMATIC')).toBeLessThan(getVisualizerTargetFps(false, 70, 'AUTO'));
+    expect(getVisualizerTargetFps(false, 70, 'PERFORMANCE')).toBeGreaterThan(
+      getVisualizerTargetFps(false, 70, 'AUTO')
+    );
+    expect(getVisualizerTargetFps(false, 70, 'CINEMATIC')).toBeLessThan(
+      getVisualizerTargetFps(false, 70, 'AUTO')
+    );
     expect(getVisualizerTargetFps(false, 70, 'PERFORMANCE', true)).toBeLessThanOrEqual(30);
     expect(getVisualizerTargetFps(true, 70, 'CINEMATIC', true)).toBeLessThanOrEqual(24);
   });

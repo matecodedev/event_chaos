@@ -25,7 +25,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     return { error };
   }
 
-  componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
+  override componentDidCatch(error: Error, errorInfo: React.ErrorInfo) {
     console.error('Unhandled error in Event Chaos UI', error, errorInfo);
   }
 
@@ -33,7 +33,7 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
     window.location.reload();
   };
 
-  render() {
+  override render() {
     const { error } = this.state;
     if (!error) return this.props.children;
 
@@ -45,8 +45,8 @@ export class ErrorBoundary extends React.Component<ErrorBoundaryProps, ErrorBoun
         <div className="aaa-panel aaa-panel-strong max-w-lg w-full p-8 text-center">
           <h1 className="aaa-heading text-2xl mb-3 text-red-400">Fallo crítico en el show</h1>
           <p className="text-sm text-slate-300 mb-4">
-            El simulador se detuvo por un error inesperado. Tu progreso de carrera guardado no se vio
-            afectado.
+            El simulador se detuvo por un error inesperado. Tu progreso de carrera guardado no se
+            vio afectado.
           </p>
           <p className="font-mono text-xs text-slate-400 bg-black/50 border border-slate-700 rounded p-3 mb-6 break-words text-left">
             {error.message || 'Error desconocido'}

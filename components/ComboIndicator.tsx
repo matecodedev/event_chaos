@@ -9,7 +9,7 @@ interface ComboIndicatorProps {
 
 export const ComboIndicator: React.FC<ComboIndicatorProps> = ({ comboState, mobile = false }) => {
   const { streakSeconds, multiplier, perfectRhythm } = comboState;
-  
+
   if (multiplier <= 1.0 && !perfectRhythm) return null;
 
   const getMultiplierColor = () => {
@@ -27,8 +27,12 @@ export const ComboIndicator: React.FC<ComboIndicatorProps> = ({ comboState, mobi
   };
 
   return (
-    <div className={`${mobile ? 'relative w-full shrink-0 animate-in slide-in-from-top duration-300 pointer-events-none' : 'absolute top-20 left-2 right-2 md:left-auto md:right-8 z-[85] animate-in slide-in-from-top duration-300'}`}>
-      <div className={`bg-slate-900/95 border-2 ${perfectRhythm ? 'border-yellow-500' : 'border-cyan-500'} rounded-xl shadow-2xl ${mobile ? 'p-3' : 'p-4'} backdrop-blur-sm ${getMultiplierGlow()}`}>
+    <div
+      className={`${mobile ? 'relative w-full shrink-0 animate-in slide-in-from-top duration-300 pointer-events-none' : 'absolute top-20 left-2 right-2 md:left-auto md:right-8 z-[85] animate-in slide-in-from-top duration-300'}`}
+    >
+      <div
+        className={`bg-slate-900/95 border-2 ${perfectRhythm ? 'border-yellow-500' : 'border-cyan-500'} rounded-xl shadow-2xl ${mobile ? 'p-3' : 'p-4'} backdrop-blur-sm ${getMultiplierGlow()}`}
+      >
         <div className="flex items-center gap-3">
           {perfectRhythm ? (
             <>
@@ -37,16 +41,16 @@ export const ComboIndicator: React.FC<ComboIndicatorProps> = ({ comboState, mobi
                 <div className="text-yellow-400 font-bold text-sm uppercase tracking-wider">
                   RITMO PERFECTO
                 </div>
-                <div className="text-xs text-slate-400 font-mono">
-                  Sistemas sincronizados
-                </div>
+                <div className="text-xs text-slate-400 font-mono">Sistemas sincronizados</div>
               </div>
             </>
           ) : (
             <>
               <Zap className={`w-6 h-6 ${getMultiplierColor()} animate-pulse`} />
               <div>
-                <div className={`${getMultiplierColor()} font-bold text-sm uppercase tracking-wider flex items-center gap-2`}>
+                <div
+                  className={`${getMultiplierColor()} font-bold text-sm uppercase tracking-wider flex items-center gap-2`}
+                >
                   COMBO x{multiplier.toFixed(1)}
                   <TrendingUp className="w-4 h-4" />
                 </div>
@@ -57,14 +61,14 @@ export const ComboIndicator: React.FC<ComboIndicatorProps> = ({ comboState, mobi
             </>
           )}
         </div>
-        
+
         {/* Progress bar for next milestone */}
         {!perfectRhythm && (
           <div className="mt-2 h-1 bg-slate-800 rounded-full overflow-hidden">
-            <div 
+            <div
               className={`h-full ${getMultiplierColor().replace('text-', 'bg-')} transition-all duration-300`}
-              style={{ 
-                width: `${Math.min(100, (streakSeconds % 10) * 10)}%` 
+              style={{
+                width: `${Math.min(100, (streakSeconds % 10) * 10)}%`
               }}
             />
           </div>

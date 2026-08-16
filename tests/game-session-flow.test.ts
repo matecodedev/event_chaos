@@ -1,6 +1,10 @@
 import { describe, expect, it } from 'vitest';
 import { GameMode, GameScenario, SystemState, SystemType } from '../types';
-import { applyTutorialSafetyNet, getTimerEndOutcome, shouldTriggerImmediateGameOver } from '../hooks/useGameLogic';
+import {
+  applyTutorialSafetyNet,
+  getTimerEndOutcome,
+  shouldTriggerImmediateGameOver
+} from '../hooks/useGameLogic';
 
 const baseScenario = (overrides: Partial<GameScenario> = {}): GameScenario => ({
   id: 'NORMAL',
@@ -12,12 +16,44 @@ const baseScenario = (overrides: Partial<GameScenario> = {}): GameScenario => ({
   ...overrides
 });
 
-const buildSystems = (health: number = 100): SystemState[] => ([
-  { id: SystemType.SOUND, name: 'Sound', health, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 },
-  { id: SystemType.LIGHTS, name: 'Lights', health, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 },
-  { id: SystemType.VIDEO, name: 'Video', health, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 },
-  { id: SystemType.STAGE, name: 'Stage', health, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 }
-]);
+const buildSystems = (health: number = 100): SystemState[] => [
+  {
+    id: SystemType.SOUND,
+    name: 'Sound',
+    health,
+    status: 'OK',
+    faderValue: 50,
+    stability: 100,
+    driftSpeed: 1
+  },
+  {
+    id: SystemType.LIGHTS,
+    name: 'Lights',
+    health,
+    status: 'OK',
+    faderValue: 50,
+    stability: 100,
+    driftSpeed: 1
+  },
+  {
+    id: SystemType.VIDEO,
+    name: 'Video',
+    health,
+    status: 'OK',
+    faderValue: 50,
+    stability: 100,
+    driftSpeed: 1
+  },
+  {
+    id: SystemType.STAGE,
+    name: 'Stage',
+    health,
+    status: 'OK',
+    faderValue: 50,
+    stability: 100,
+    driftSpeed: 1
+  }
+];
 
 const WIN = {
   publicInterest: 60,
@@ -68,7 +104,11 @@ describe('Session Flow Logic', () => {
   });
 
   it('does not trigger immediate game over for tutorial safety states', () => {
-    const tutorialScenario = baseScenario({ id: 'TUTORIAL', isTutorial: true, difficulty: 'TUTORIAL' });
+    const tutorialScenario = baseScenario({
+      id: 'TUTORIAL',
+      isTutorial: true,
+      difficulty: 'TUTORIAL'
+    });
     const systems = buildSystems(0);
 
     const result = shouldTriggerImmediateGameOver(
@@ -83,7 +123,11 @@ describe('Session Flow Logic', () => {
   });
 
   it('applies tutorial safety net for stress and budget', () => {
-    const tutorialScenario = baseScenario({ id: 'TUTORIAL', isTutorial: true, difficulty: 'TUTORIAL' });
+    const tutorialScenario = baseScenario({
+      id: 'TUTORIAL',
+      isTutorial: true,
+      difficulty: 'TUTORIAL'
+    });
 
     const safe = applyTutorialSafetyNet(tutorialScenario, { stress: 95, budget: -250 });
 

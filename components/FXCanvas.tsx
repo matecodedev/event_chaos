@@ -1,5 +1,9 @@
 import React, { useRef, useEffect } from 'react';
-import { getFrameIntervalMs, getFxRenderPlan, getVisualQualityProfile } from '../utils/visualPerformance';
+import {
+  getFrameIntervalMs,
+  getFxRenderPlan,
+  getVisualQualityProfile
+} from '../utils/visualPerformance';
 import type { VisualQualityMode } from '../utils/visualPerformance';
 
 interface FXCanvasProps {
@@ -46,13 +50,15 @@ export const FXCanvas: React.FC<FXCanvasProps> = ({
     typeof document === 'undefined' ? true : document.visibilityState !== 'hidden'
   );
   const appliedDprCapRef = useRef(1);
-  const qualityRef = useRef(getVisualQualityProfile({
-    isMobile,
-    stressLevel,
-    activeEvents,
-    criticalEvents,
-    qualityMode
-  }));
+  const qualityRef = useRef(
+    getVisualQualityProfile({
+      isMobile,
+      stressLevel,
+      activeEvents,
+      criticalEvents,
+      qualityMode
+    })
+  );
   const frameIntervalRef = useRef(getFrameIntervalMs(qualityRef.current.targetFps));
 
   useEffect(() => {
@@ -221,12 +227,12 @@ export const FXCanvas: React.FC<FXCanvasProps> = ({
 
       // 1. Draw Dynamic Background Grid
       // Speed depends on stress
-      const speed = 0.4 + (currentStress / 100) * 3.2; 
+      const speed = 0.4 + (currentStress / 100) * 3.2;
       const gridSize = quality.gridSize;
       const offset = (timeRef.current * speed) % gridSize;
 
       if (renderPlan.drawGrid) {
-        ctx.strokeStyle = `rgba(34, 211, 238, ${0.05 + (currentStress / 400)})`; // Cyan, transparency based on stress
+        ctx.strokeStyle = `rgba(34, 211, 238, ${0.05 + currentStress / 400})`; // Cyan, transparency based on stress
         ctx.lineWidth = 1;
 
         // Vertical Lines (Moving Perspective attempt)
@@ -272,22 +278,21 @@ export const FXCanvas: React.FC<FXCanvasProps> = ({
 
       // 3. Draw Digital Noise / Grain randomly
       if (renderPlan.drawNoise && currentStress > 50) {
-         const baseNoise = (reducedFx ? 0.9 : 1.8) * quality.noiseScale * renderPlan.noiseMultiplier;
-         const noiseCount = Math.floor((currentStress - 50) * baseNoise);
-         ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
-         for(let i=0; i<noiseCount; i++) {
-             ctx.fillRect(
-                 Math.random() * viewportWidth, 
-                 Math.random() * viewportHeight, 
-                 2, 2
-             );
-         }
+        const baseNoise = (reducedFx ? 0.9 : 1.8) * quality.noiseScale * renderPlan.noiseMultiplier;
+        const noiseCount = Math.floor((currentStress - 50) * baseNoise);
+        ctx.fillStyle = 'rgba(255, 255, 255, 0.5)';
+        for (let i = 0; i < noiseCount; i++) {
+          ctx.fillRect(Math.random() * viewportWidth, Math.random() * viewportHeight, 2, 2);
+        }
       }
 
       // 4. Stress glitch bands
       if (renderPlan.drawGlitch && currentStress > 68) {
         const bandStep = (reducedFx ? 13 : 9) / Math.max(0.4, quality.glitchScale);
-        const bandCount = Math.max(1, Math.floor(((currentStress - 65) / bandStep) * renderPlan.glitchBandMultiplier));
+        const bandCount = Math.max(
+          1,
+          Math.floor(((currentStress - 65) / bandStep) * renderPlan.glitchBandMultiplier)
+        );
         for (let i = 0; i < bandCount; i++) {
           const y = Math.random() * viewportHeight;
           const h = Math.random() * (reducedFx ? 8 : 14) + 2;

@@ -89,10 +89,16 @@ export const buildRuntimeDiagnosticsSnapshot = ({
     score -= 4;
   }
 
-  if (typeof mobileCenterHeight === 'number' && Number.isFinite(mobileCenterHeight) && mobileCenterHeight < 320) {
+  if (
+    typeof mobileCenterHeight === 'number' &&
+    Number.isFinite(mobileCenterHeight) &&
+    mobileCenterHeight < 320
+  ) {
     score -= 8;
     issues.push('HUD móvil con espacio limitado');
-    recommendations.push('En móvil compacto, resuelve el evento primario antes de abrir otras capas.');
+    recommendations.push(
+      'En móvil compacto, resuelve el evento primario antes de abrir otras capas.'
+    );
   }
 
   if (visualProfile.targetFps <= 28) {

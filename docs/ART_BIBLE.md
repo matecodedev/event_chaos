@@ -1,6 +1,7 @@
 # Event Chaos Art Bible (Block 1)
 
 ## 1. Creative North Star
+
 Event Chaos debe sentirse como una cabina técnica de alto riesgo: elegante, precisa y con tensión constante. La interfaz no es "HUD genérico", es equipamiento profesional de show en vivo.
 
 - Core fantasy: sobrevivir una producción en vivo bajo presión.
@@ -10,17 +11,21 @@ Event Chaos debe sentirse como una cabina técnica de alto riesgo: elegante, pre
 ## 2. Visual Pillars
 
 ### 2.1 Tactical Readability
+
 Cada estado crítico debe entenderse en menos de 300 ms:
+
 - Prioridad por contraste de tono y forma.
 - Grilla y spacing consistentes.
 - Jerarquía visual de 3 niveles: crítico, operativo, decorativo.
 
 ### 2.2 Cinematic Control Surface
+
 - Paneles con materiales técnicos (glass + metal + glow calibrado).
 - Luces de estado y acentos reactivas a escenario/modo.
 - Microanimación útil: enfatiza acciones y amenazas, no distrae.
 
 ### 2.3 Scenario Signature
+
 Cada escenario tiene personalidad visual propia, sin romper consistencia del sistema UI.
 
 ## 3. Typography System
@@ -30,6 +35,7 @@ Cada escenario tiene personalidad visual propia, sin romper consistencia del sis
 - Data/Telemetry: `JetBrains Mono` (números, labels técnicas, timers).
 
 Regla:
+
 - Display solo para titulares/branding.
 - Mono para datos operativos y etiquetas cortas.
 - Body para contenido descriptivo y navegación.
@@ -37,11 +43,13 @@ Regla:
 ## 4. Color & Material System
 
 ### 4.1 Base Palette
+
 - Shell layers: triple gradiente profundo (`--aaa-bg-0/1/2`).
 - Panel material: top/bottom rgb + alpha controlado.
 - Accents: toolbar, chips, heading glow por perfil activo.
 
 ### 4.2 Threat Adaptation
+
 - A mayor amenaza: más energía en aurora y bordes.
 - En pausa: reducción del pulso visual sin perder legibilidad.
 
@@ -75,6 +83,7 @@ Regla:
 ## 8. Audio Direction (alignment block)
 
 Aunque el bloque 1 es visual/UI, la dirección contempla:
+
 - mezcla técnica limpia (no saturación constante),
 - capas reactivas por threat,
 - identidad sonora por escenario.

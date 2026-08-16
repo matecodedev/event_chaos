@@ -44,8 +44,11 @@ const SliderRow: React.FC<{
         <span>{label}</span>
         <span className="text-cyan-300">{Math.round(value * 100)}%</span>
       </div>
+      {/* Named explicitly: the wrapping label also contains the live percentage,
+          which the range input already announces as its own value. */}
       <input
         type="range"
+        aria-label={label}
         min={min}
         max={max}
         step={step}
@@ -104,11 +107,12 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
   onReset,
   runtimeDiagnostics
 }) => {
-  const runtimeToneClass = runtimeDiagnostics?.riskLevel === 'CRITICAL'
-    ? 'text-red-300 border-red-500/50 bg-red-950/40'
-    : runtimeDiagnostics?.riskLevel === 'WATCH'
-      ? 'text-amber-200 border-amber-500/50 bg-amber-950/40'
-      : 'text-emerald-200 border-emerald-500/45 bg-emerald-950/35';
+  const runtimeToneClass =
+    runtimeDiagnostics?.riskLevel === 'CRITICAL'
+      ? 'text-red-300 border-red-500/50 bg-red-950/40'
+      : runtimeDiagnostics?.riskLevel === 'WATCH'
+        ? 'text-amber-200 border-amber-500/50 bg-amber-950/40'
+        : 'text-emerald-200 border-emerald-500/45 bg-emerald-950/35';
 
   return (
     <div className="absolute inset-0 z-[130] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4">
@@ -121,7 +125,12 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
         <div className="sticky top-0 z-10 flex items-center justify-between px-4 py-3 border-b border-slate-800 bg-slate-950/95">
           <div className="flex items-center gap-2">
             <SlidersHorizontal aria-hidden="true" className="w-5 h-5 text-cyan-400" />
-            <h2 id="settings-title" className="text-sm font-bold font-mono tracking-[0.2em] text-slate-100 uppercase">Ajustes</h2>
+            <h2
+              id="settings-title"
+              className="text-sm font-bold font-mono tracking-[0.2em] text-slate-100 uppercase"
+            >
+              Ajustes
+            </h2>
           </div>
           <button
             type="button"
@@ -139,7 +148,12 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
               <Eye className="w-4 h-4 text-cyan-400" />
               Visual
             </div>
-            <OptionPills options={QUALITY_OPTIONS} current={visualQualityMode} onSelect={onVisualQualityChange} groupLabel="Calidad visual" />
+            <OptionPills
+              options={QUALITY_OPTIONS}
+              current={visualQualityMode}
+              onSelect={onVisualQualityChange}
+              groupLabel="Calidad visual"
+            />
             <label className="flex items-center justify-between rounded border border-slate-800 bg-slate-900/60 p-3 text-sm text-slate-200">
               <span>Reducir animaciones</span>
               <input
@@ -165,14 +179,39 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
               <AudioLines className="w-4 h-4 text-cyan-400" />
               Audio
             </div>
-            <OptionPills options={SPATIAL_OPTIONS} current={audioSpatialMode} onSelect={onAudioSpatialModeChange} groupLabel="Modo de audio espacial" />
+            <OptionPills
+              options={SPATIAL_OPTIONS}
+              current={audioSpatialMode}
+              onSelect={onAudioSpatialModeChange}
+              groupLabel="Modo de audio espacial"
+            />
             <div className="grid grid-cols-1 md:grid-cols-2 gap-3">
-              <SliderRow label="Master" value={audioMix.master} onChange={(value) => onAudioMixChange({ master: value })} />
-              <SliderRow label="Music" value={audioMix.music} onChange={(value) => onAudioMixChange({ music: value })} />
-              <SliderRow label="SFX" value={audioMix.sfx} onChange={(value) => onAudioMixChange({ sfx: value })} />
-              <SliderRow label="UI" value={audioMix.ui} onChange={(value) => onAudioMixChange({ ui: value })} />
+              <SliderRow
+                label="Master"
+                value={audioMix.master}
+                onChange={(value) => onAudioMixChange({ master: value })}
+              />
+              <SliderRow
+                label="Music"
+                value={audioMix.music}
+                onChange={(value) => onAudioMixChange({ music: value })}
+              />
+              <SliderRow
+                label="SFX"
+                value={audioMix.sfx}
+                onChange={(value) => onAudioMixChange({ sfx: value })}
+              />
+              <SliderRow
+                label="UI"
+                value={audioMix.ui}
+                onChange={(value) => onAudioMixChange({ ui: value })}
+              />
               <div className="md:col-span-2">
-                <SliderRow label="Crowd" value={audioMix.crowd} onChange={(value) => onAudioMixChange({ crowd: value })} />
+                <SliderRow
+                  label="Crowd"
+                  value={audioMix.crowd}
+                  onChange={(value) => onAudioMixChange({ crowd: value })}
+                />
               </div>
             </div>
           </section>
@@ -210,7 +249,9 @@ export const GameSettingsPanel: React.FC<GameSettingsPanelProps> = ({
 
               {runtimeDiagnostics.recommendations.length > 0 && (
                 <div className="rounded border border-slate-800 bg-slate-900/60 p-3 space-y-1.5">
-                  <div className="text-[11px] font-mono uppercase tracking-wider text-cyan-300">Recomendaciones</div>
+                  <div className="text-[11px] font-mono uppercase tracking-wider text-cyan-300">
+                    Recomendaciones
+                  </div>
                   {runtimeDiagnostics.recommendations.slice(0, 2).map((recommendation, index) => (
                     <div key={`${recommendation}-${index}`} className="text-[11px] text-slate-300">
                       - {recommendation}

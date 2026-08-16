@@ -13,9 +13,11 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
     lastBonusTime: 0,
     perfectRhythm: false
   });
-  
+
   const lastCheckRef = useRef<number>(Date.now());
-  const bonusCallbackRef = useRef<((bonus: { type: string; amount: number; message: string }) => void) | null>(null);
+  const bonusCallbackRef = useRef<
+    ((bonus: { type: string; amount: number; message: string }) => void) | null
+  >(null);
   const systemsRef = useRef(systems);
 
   useEffect(() => {
@@ -40,21 +42,21 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
       const deltaTime = (now - lastCheckRef.current) / 1000; // seconds
       lastCheckRef.current = now;
       const currentSystems = Object.values(systemsRef.current) as SystemState[];
-      const allSafe = currentSystems.every(sys => sys.faderValue >= 40 && sys.faderValue <= 60);
-      const values = currentSystems.map(s => s.faderValue);
+      const allSafe = currentSystems.every((sys) => sys.faderValue >= 40 && sys.faderValue <= 60);
+      const values = currentSystems.map((s) => s.faderValue);
       const avg = values.reduce((a, b) => a + b, 0) / values.length;
-      const inSync = values.every(v => Math.abs(v - avg) < 5);
+      const inSync = values.every((v) => Math.abs(v - avg) < 5);
 
-      setComboState(prev => {
+      setComboState((prev) => {
         let newStreak = prev.streakSeconds;
         let newMultiplier = prev.multiplier;
-        let newPerfectRhythm = inSync && allSafe;
+        const newPerfectRhythm = inSync && allSafe;
         let bonusAwarded = false;
 
         if (allSafe) {
           // Increase streak
           newStreak += deltaTime;
-          
+
           // Calculate multiplier based on streak
           if (newStreak >= 60) {
             newMultiplier = 2.5; // 60+ seconds = 2.5x
@@ -76,7 +78,11 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
                 message: '¡10 segundos estables! +$50'
               });
             }
-          } else if (newStreak >= 30 && prev.streakSeconds < 30 && now - prev.lastBonusTime > 1000) {
+          } else if (
+            newStreak >= 30 &&
+            prev.streakSeconds < 30 &&
+            now - prev.lastBonusTime > 1000
+          ) {
             bonusAwarded = true;
             if (bonusCallbackRef.current) {
               bonusCallbackRef.current({
@@ -85,7 +91,11 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
                 message: '¡30 segundos estables! +$150 y -10% estrés'
               });
             }
-          } else if (newStreak >= 60 && prev.streakSeconds < 60 && now - prev.lastBonusTime > 1000) {
+          } else if (
+            newStreak >= 60 &&
+            prev.streakSeconds < 60 &&
+            now - prev.lastBonusTime > 1000
+          ) {
             bonusAwarded = true;
             if (bonusCallbackRef.current) {
               bonusCallbackRef.current({
@@ -113,9 +123,12 @@ export const useComboSystem = ({ systems, isPlaying }: UseComboSystemProps) => {
     return () => clearInterval(interval);
   }, [isPlaying]);
 
-  const setBonusCallback = useCallback((callback: (bonus: { type: string; amount: number; message: string }) => void) => {
-    bonusCallbackRef.current = callback;
-  }, []);
+  const setBonusCallback = useCallback(
+    (callback: (bonus: { type: string; amount: number; message: string }) => void) => {
+      bonusCallbackRef.current = callback;
+    },
+    []
+  );
 
   return {
     comboState,

@@ -55,7 +55,7 @@ describe('Mobile UI Policy Regressions', () => {
     ];
 
     const sorted = sortEventsByUrgency(events);
-    expect(sorted.map(event => event.id)).toEqual([
+    expect(sorted.map((event) => event.id)).toEqual([
       'high-priority',
       'critical-sooner',
       'low-priority',

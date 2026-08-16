@@ -1,5 +1,11 @@
 import { GameMode } from '../../types';
-import type { GameScenario, GameStats, MissionDefinition, SystemState, SystemType } from '../../types';
+import type {
+  GameScenario,
+  GameStats,
+  MissionDefinition,
+  SystemState,
+  SystemType
+} from '../../types';
 import { clamp } from './math';
 import type { MatchPhase } from './director';
 import type { EconomyPhaseProfile, EconomyStreakState } from './economy';
@@ -27,23 +33,24 @@ const getCriteriaBounds = (criterion: MissionDefinition['criteria'][number]) => 
 export const getMissionComplexityScore = (mission: MissionDefinition) => {
   const criteriaCount = mission.criteria.length;
   const criteriaDensity = clamp((criteriaCount - 1) / 3, 0, 1);
-  const precisionScore = mission.criteria.length > 0
-    ? mission.criteria.reduce((sum, criterion) => {
-      const { min, max } = getCriteriaBounds(criterion);
-      const width = clamp(max - min, 0, 100);
-      return sum + (1 - (width / 100));
-    }, 0) / mission.criteria.length
-    : 0;
+  const precisionScore =
+    mission.criteria.length > 0
+      ? mission.criteria.reduce((sum, criterion) => {
+          const { min, max } = getCriteriaBounds(criterion);
+          const width = clamp(max - min, 0, 100);
+          return sum + (1 - width / 100);
+        }, 0) / mission.criteria.length
+      : 0;
   const holdComplexity = clamp((mission.holdDuration - 8) / 16, 0, 1);
   const timeoutPressure = clamp(mission.holdDuration / Math.max(1, mission.timeout), 0, 1);
   const rewardSignal = clamp(mission.rewardCash / 1800, 0, 1);
 
   return clamp(
-    (criteriaDensity * 0.32) +
-    (precisionScore * 0.28) +
-    (holdComplexity * 0.18) +
-    (timeoutPressure * 0.12) +
-    (rewardSignal * 0.1),
+    criteriaDensity * 0.32 +
+      precisionScore * 0.28 +
+      holdComplexity * 0.18 +
+      timeoutPressure * 0.12 +
+      rewardSignal * 0.1,
     0,
     1
   );
@@ -58,10 +65,10 @@ export const getMissionSystemFitScore = (
   let accumulatedGap = 0;
   let inRangeCount = 0;
 
-  mission.criteria.forEach(criterion => {
+  mission.criteria.forEach((criterion) => {
     const value = systems[criterion.systemId]?.faderValue ?? 50;
     const { min, max } = getCriteriaBounds(criterion);
-    const gap = value < min ? (min - value) : value > max ? (value - max) : 0;
+    const gap = value < min ? min - value : value > max ? value - max : 0;
     if (gap === 0) inRangeCount += 1;
     accumulatedGap += clamp(gap / 100, 0, 1);
   });
@@ -69,7 +76,7 @@ export const getMissionSystemFitScore = (
   const avgGap = accumulatedGap / mission.criteria.length;
   const inRangeRatio = inRangeCount / mission.criteria.length;
 
-  return clamp((1 - avgGap) * 0.75 + (inRangeRatio * 0.25), 0, 1);
+  return clamp((1 - avgGap) * 0.75 + inRangeRatio * 0.25, 0, 1);
 };
 
 export const getMissionTargetComplexity = (context: MissionDirectorContext) => {
@@ -94,14 +101,15 @@ export const getMissionTargetComplexity = (context: MissionDirectorContext) => {
   }[context.mode];
 
   const stressDelta =
-    context.stats.stress >= 85 ? -0.26 :
-    context.stats.stress >= 70 ? -0.16 :
-    context.stats.stress <= 35 ? 0.08 :
-    0;
+    context.stats.stress >= 85
+      ? -0.26
+      : context.stats.stress >= 70
+        ? -0.16
+        : context.stats.stress <= 35
+          ? 0.08
+          : 0;
   const budgetDelta =
-    context.stats.budget <= 1200 ? -0.15 :
-    context.stats.budget >= 7000 ? 0.06 :
-    0;
+    context.stats.budget <= 1200 ? -0.15 : context.stats.budget >= 7000 ? 0.06 : 0;
 
   return clamp(phaseBase + difficultyDelta + modeDelta + stressDelta + budgetDelta, 0.18, 0.9);
 };
@@ -118,7 +126,7 @@ export const pickAdaptiveMissionFromQueue = (
     return null;
   }
 
-  const missionById = new Map(missionPool.map(mission => [mission.id, mission]));
+  const missionById = new Map(missionPool.map((mission) => [mission.id, mission]));
   const targetComplexity = getMissionTargetComplexity(context);
   const pressureWeight = context.stats.stress >= 70 ? 0.4 : 0.25;
   const challengeWeight = context.stats.stress <= 45 ? 0.25 : 0.12;
@@ -137,15 +145,17 @@ export const pickAdaptiveMissionFromQueue = (
     const complexity = getMissionComplexityScore(mission);
     const complexityAlignment = 1 - Math.abs(complexity - targetComplexity);
     const fitScore = getMissionSystemFitScore(mission, context.systems);
-    const economyScore = context.stats.budget <= 1200 ? fitScore : (0.5 * fitScore + 0.5 * complexityAlignment);
+    const economyScore =
+      context.stats.budget <= 1200 ? fitScore : 0.5 * fitScore + 0.5 * complexityAlignment;
     const queueProximityBonus = (endIndex - queueIndex) * 0.003;
-    const deterministicNoise = ((queueIndex - queueStartIndex + 1) * clamp(randomFactor, 0, 1)) * 0.002;
+    const deterministicNoise =
+      (queueIndex - queueStartIndex + 1) * clamp(randomFactor, 0, 1) * 0.002;
 
     const score =
-      (complexityAlignment * alignmentWeight) +
-      (fitScore * pressureWeight) +
-      (complexity * challengeWeight) +
-      (economyScore * economyWeight) +
+      complexityAlignment * alignmentWeight +
+      fitScore * pressureWeight +
+      complexity * challengeWeight +
+      economyScore * economyWeight +
       queueProximityBonus +
       deterministicNoise;
 
@@ -181,7 +191,11 @@ export const getMissionRewardCash = (
   const pressureBonus =
     (stressLevel >= 75 ? 0.08 : 0) +
     (activeEventsCount >= 4 ? 0.05 : activeEventsCount >= 2 ? 0.03 : 0);
-  const totalMultiplier = clamp(difficultyMultiplier * modeMultiplier * rewardMultiplier * (1 + pressureBonus), 0.8, 1.6);
+  const totalMultiplier = clamp(
+    difficultyMultiplier * modeMultiplier * rewardMultiplier * (1 + pressureBonus),
+    0.8,
+    1.6
+  );
   return Math.max(50, Math.round(baseRewardCash * totalMultiplier));
 };
 
@@ -193,12 +207,16 @@ export const getMissionRewardPacingMultiplier = (
   fatigueLevel: number
 ) => {
   const successBonus = Math.min(0.15, streakState.missionSuccessStreak * 0.03);
-  const failComeback = Math.min(0.22, streakState.missionFailStreak * economyProfile.comebackBonusMultiplier * 0.7);
+  const failComeback = Math.min(
+    0.22,
+    streakState.missionFailStreak * economyProfile.comebackBonusMultiplier * 0.7
+  );
   const budgetComeback = stats.budget <= 1200 ? economyProfile.comebackBonusMultiplier * 0.6 : 0;
   const stressComeback = stats.stress >= 75 ? economyProfile.comebackBonusMultiplier * 0.5 : 0;
   const finaleFatigueBonus = phase === 'FINALE' && fatigueLevel >= 0.72 ? 0.08 : 0;
 
-  const total = economyProfile.missionRewardMultiplier *
+  const total =
+    economyProfile.missionRewardMultiplier *
     (1 + successBonus + failComeback + budgetComeback + stressComeback + finaleFatigueBonus);
   return clamp(total, 0.76, 1.62);
 };
@@ -210,14 +228,18 @@ export const getMissionTimeoutBudgetPenalty = (
 ) => {
   const basePenalty = Math.max(
     120,
-    Math.round(mission.rewardCash * 0.22) + (mission.criteria.length * 55)
+    Math.round(mission.rewardCash * 0.22) + mission.criteria.length * 55
   );
   const pressureRelief =
-    stats.stress >= 85 ? economyProfile.comebackBonusMultiplier * 0.75 :
-    stats.stress >= 70 ? economyProfile.comebackBonusMultiplier * 0.45 :
-    0;
+    stats.stress >= 85
+      ? economyProfile.comebackBonusMultiplier * 0.75
+      : stats.stress >= 70
+        ? economyProfile.comebackBonusMultiplier * 0.45
+        : 0;
   const budgetRelief = stats.budget <= 1000 ? economyProfile.comebackBonusMultiplier * 0.35 : 0;
-  const penaltyMultiplier = Math.max(0.58, economyProfile.failurePenaltyMultiplier - pressureRelief - budgetRelief);
+  const penaltyMultiplier = Math.max(
+    0.58,
+    economyProfile.failurePenaltyMultiplier - pressureRelief - budgetRelief
+  );
   return Math.max(0, Math.round(basePenalty * penaltyMultiplier));
 };
-

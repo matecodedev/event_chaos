@@ -12,12 +12,7 @@ export interface AIRuntimeConfig {
   hasApiKey: boolean;
 }
 
-const INVALID_KEYS = new Set([
-  '',
-  'PLACEHOLDER_API_KEY',
-  'YOUR_API_KEY',
-  'CHANGE_ME'
-]);
+const INVALID_KEYS = new Set(['', 'PLACEHOLDER_API_KEY', 'YOUR_API_KEY', 'CHANGE_ME']);
 
 const normalizeKey = (value: unknown): string => {
   if (typeof value !== 'string') return '';

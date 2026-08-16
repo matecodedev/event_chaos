@@ -10,14 +10,24 @@ interface UpgradeShopProps {
   onClose: () => void;
 }
 
-export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints, onPurchase, onClose }) => {
+export const UpgradeShop: React.FC<UpgradeShopProps> = ({
+  upgrades,
+  careerPoints,
+  onPurchase,
+  onClose
+}) => {
   const getCategoryIcon = (category: string) => {
     switch (category) {
-      case 'REFLEXES': return <Zap className="w-5 h-5 text-yellow-400" />;
-      case 'RESISTANCE': return <Shield className="w-5 h-5 text-blue-400" />;
-      case 'KNOWLEDGE': return <Book className="w-5 h-5 text-purple-400" />;
-      case 'EFFICIENCY': return <Settings className="w-5 h-5 text-green-400" />;
-      default: return <Settings className="w-5 h-5 text-slate-400" />;
+      case 'REFLEXES':
+        return <Zap className="w-5 h-5 text-yellow-400" />;
+      case 'RESISTANCE':
+        return <Shield className="w-5 h-5 text-blue-400" />;
+      case 'KNOWLEDGE':
+        return <Book className="w-5 h-5 text-purple-400" />;
+      case 'EFFICIENCY':
+        return <Settings className="w-5 h-5 text-green-400" />;
+      default:
+        return <Settings className="w-5 h-5 text-slate-400" />;
     }
   };
 
@@ -31,12 +41,16 @@ export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints
       >
         <div className="flex justify-between items-center mb-6">
           <div>
-            <h2 id="upgrades-title" className="text-3xl font-bold text-white flex items-center gap-2">
+            <h2
+              id="upgrades-title"
+              className="text-3xl font-bold text-white flex items-center gap-2"
+            >
               <Settings aria-hidden="true" className="w-8 h-8 text-cyan-500" />
               MEJORAS PERMANENTES
             </h2>
             <p className="text-slate-400 text-sm mt-1">
-              Puntos de carrera disponibles: <span className="text-cyan-400 font-bold">{careerPoints}</span>
+              Puntos de carrera disponibles:{' '}
+              <span className="text-cyan-400 font-bold">{careerPoints}</span>
             </p>
           </div>
           <button
@@ -50,15 +64,15 @@ export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          {upgrades.map(upgrade => (
+          {upgrades.map((upgrade) => (
             <div
               key={upgrade.id}
               className={`p-4 rounded-lg border-2 transition-all ${
                 upgrade.unlocked
                   ? 'border-green-500 bg-green-950/20'
                   : upgrade.canPurchase
-                  ? 'border-cyan-500 bg-cyan-950/20 hover:border-cyan-400'
-                  : 'border-slate-700 bg-slate-800/50 opacity-60'
+                    ? 'border-cyan-500 bg-cyan-950/20 hover:border-cyan-400'
+                    : 'border-slate-700 bg-slate-800/50 opacity-60'
               }`}
             >
               <div className="flex items-start gap-3">
@@ -66,7 +80,9 @@ export const UpgradeShop: React.FC<UpgradeShopProps> = ({ upgrades, careerPoints
                 <div className="flex-1">
                   <div className="flex items-center gap-2 mb-1">
                     {getCategoryIcon(upgrade.category)}
-                    <h3 className={`font-bold ${upgrade.unlocked ? 'text-green-400' : 'text-white'}`}>
+                    <h3
+                      className={`font-bold ${upgrade.unlocked ? 'text-green-400' : 'text-white'}`}
+                    >
                       {upgrade.name}
                     </h3>
                     {upgrade.unlocked && <Check className="w-4 h-4 text-green-500" />}

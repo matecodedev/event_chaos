@@ -33,7 +33,7 @@ import {
   pickAdaptiveMissionFromQueue,
   getScenarioCompletionRewards,
   getStaticEventSeverityChance,
-  getStaticEventSpawnDelayMs,
+  getStaticEventSpawnDelayMs
 } from '../hooks/useGameLogic';
 import { shouldRunFinalAchievementCheck } from '../hooks/useAchievementSystem';
 
@@ -95,12 +95,44 @@ describe('Game Logic Regressions', () => {
 
   it('calculates scenario score with mode/difficulty scaling and stability impact', () => {
     const healthySystems = [
-      { id: SystemType.SOUND, name: 'Sound', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 },
-      { id: SystemType.LIGHTS, name: 'Lights', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 },
-      { id: SystemType.VIDEO, name: 'Video', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 },
-      { id: SystemType.STAGE, name: 'Stage', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 }
+      {
+        id: SystemType.SOUND,
+        name: 'Sound',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      },
+      {
+        id: SystemType.LIGHTS,
+        name: 'Lights',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      },
+      {
+        id: SystemType.VIDEO,
+        name: 'Video',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      },
+      {
+        id: SystemType.STAGE,
+        name: 'Stage',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      }
     ];
-    const damagedSystems = healthySystems.map(system => ({
+    const damagedSystems = healthySystems.map((system) => ({
       ...system,
       health: 40,
       status: 'WARNING' as const
@@ -113,18 +145,40 @@ describe('Game Logic Regressions', () => {
       budget: 5000
     };
 
-    const normalScore = calculateScenarioScore(GameMode.NORMAL, 'NORMAL', baselineStats, healthySystems);
-    const hardcoreExtreme = calculateScenarioScore(GameMode.HARDCORE, 'EXTREME', baselineStats, healthySystems);
-    const unstableScore = calculateScenarioScore(GameMode.NORMAL, 'NORMAL', baselineStats, damagedSystems);
+    const normalScore = calculateScenarioScore(
+      GameMode.NORMAL,
+      'NORMAL',
+      baselineStats,
+      healthySystems
+    );
+    const hardcoreExtreme = calculateScenarioScore(
+      GameMode.HARDCORE,
+      'EXTREME',
+      baselineStats,
+      healthySystems
+    );
+    const unstableScore = calculateScenarioScore(
+      GameMode.NORMAL,
+      'NORMAL',
+      baselineStats,
+      damagedSystems
+    );
 
     expect(hardcoreExtreme).toBeGreaterThan(normalScore);
     expect(normalScore).toBeGreaterThan(unstableScore);
-    expect(calculateScenarioScore(GameMode.ENDLESS, 'TUTORIAL', {
-      publicInterest: -50,
-      clientSatisfaction: -20,
-      stress: 999,
-      budget: -300
-    }, [])).toBeGreaterThanOrEqual(1);
+    expect(
+      calculateScenarioScore(
+        GameMode.ENDLESS,
+        'TUTORIAL',
+        {
+          publicInterest: -50,
+          clientSatisfaction: -20,
+          stress: 999,
+          budget: -300
+        },
+        []
+      )
+    ).toBeGreaterThanOrEqual(1);
   });
 
   it('adapts event concurrency cap by difficulty, mode and stress', () => {
@@ -223,18 +277,32 @@ describe('Game Logic Regressions', () => {
       options: [{ label: 'OK', isCorrect: true, stressImpact: -1 }]
     };
 
-    const noTarget = createEscalatedEvent(baseEvent, [{
-      title: 'Sin Escalación',
-      description: 'Evento aislado',
-      escalationEvent: 'No Existe',
-      options: [{ label: 'OK', isCorrect: true, stressImpact: -1 }]
-    }], 10000, () => 'id_x');
+    const noTarget = createEscalatedEvent(
+      baseEvent,
+      [
+        {
+          title: 'Sin Escalación',
+          description: 'Evento aislado',
+          escalationEvent: 'No Existe',
+          options: [{ label: 'OK', isCorrect: true, stressImpact: -1 }]
+        }
+      ],
+      10000,
+      () => 'id_x'
+    );
 
-    const noEscalation = createEscalatedEvent(baseEvent, [{
-      title: 'Sin Escalación',
-      description: 'Evento aislado',
-      options: [{ label: 'OK', isCorrect: true, stressImpact: -1 }]
-    }], 10000, () => 'id_y');
+    const noEscalation = createEscalatedEvent(
+      baseEvent,
+      [
+        {
+          title: 'Sin Escalación',
+          description: 'Evento aislado',
+          options: [{ label: 'OK', isCorrect: true, stressImpact: -1 }]
+        }
+      ],
+      10000,
+      () => 'id_y'
+    );
 
     expect(noTarget).toBeNull();
     expect(noEscalation).toBeNull();
@@ -369,7 +437,9 @@ describe('Game Logic Regressions', () => {
     );
 
     expect(overloadProfile.maxInjectedEvents).toBe(1);
-    expect(overloadProfile.aiCooldownMultiplier).toBeGreaterThan(climaxProfile.aiCooldownMultiplier);
+    expect(overloadProfile.aiCooldownMultiplier).toBeGreaterThan(
+      climaxProfile.aiCooldownMultiplier
+    );
     expect(overloadProfile.aiChanceMultiplier).toBeLessThan(climaxProfile.aiChanceMultiplier);
     expect(overloadProfile.durationMultiplier).toBeGreaterThan(climaxProfile.durationMultiplier);
   });
@@ -503,25 +573,23 @@ describe('Game Logic Regressions', () => {
 
     expect(directed.spawnDelayMultiplier).toBeLessThan(baseDirector.spawnDelayMultiplier);
     expect(directed.cascadeChance).toBeGreaterThanOrEqual(baseDirector.cascadeChance);
-    expect(proceduralBossed.aiChanceMultiplier).toBeGreaterThanOrEqual(proceduralBase.aiChanceMultiplier);
-    expect(proceduralBossed.aiCooldownMultiplier).toBeLessThanOrEqual(proceduralBase.aiCooldownMultiplier);
+    expect(proceduralBossed.aiChanceMultiplier).toBeGreaterThanOrEqual(
+      proceduralBase.aiChanceMultiplier
+    );
+    expect(proceduralBossed.aiCooldownMultiplier).toBeLessThanOrEqual(
+      proceduralBase.aiCooldownMultiplier
+    );
   });
 
   it('scales economy profile by phase pressure and applies boss deltas', () => {
-    const calmOpening = getPhaseEconomyProfile(
-      'NORMAL',
-      GameMode.NORMAL,
-      'OPENING',
-      35,
-      { fatigueLevel: 0.25, pressureLevel: 0.22 }
-    );
-    const pressuredFinale = getPhaseEconomyProfile(
-      'EXTREME',
-      GameMode.HARDCORE,
-      'FINALE',
-      86,
-      { fatigueLevel: 0.86, pressureLevel: 0.82 }
-    );
+    const calmOpening = getPhaseEconomyProfile('NORMAL', GameMode.NORMAL, 'OPENING', 35, {
+      fatigueLevel: 0.25,
+      pressureLevel: 0.22
+    });
+    const pressuredFinale = getPhaseEconomyProfile('EXTREME', GameMode.HARDCORE, 'FINALE', 86, {
+      fatigueLevel: 0.86,
+      pressureLevel: 0.82
+    });
 
     const activeBoss = getScenarioBossMomentProfile(
       'WORLD_TOUR',
@@ -539,19 +607,22 @@ describe('Game Logic Regressions', () => {
     );
     const bossEconomy = applyBossMomentToEconomyProfile(pressuredFinale, activeBoss);
 
-    expect(pressuredFinale.missionRewardMultiplier).toBeGreaterThan(calmOpening.missionRewardMultiplier);
-    expect(pressuredFinale.failurePenaltyMultiplier).toBeLessThanOrEqual(pressuredFinale.expiryPenaltyMultiplier);
-    expect(bossEconomy.eventRewardMultiplier).toBeGreaterThanOrEqual(pressuredFinale.eventRewardMultiplier);
+    expect(pressuredFinale.missionRewardMultiplier).toBeGreaterThan(
+      calmOpening.missionRewardMultiplier
+    );
+    expect(pressuredFinale.failurePenaltyMultiplier).toBeLessThanOrEqual(
+      pressuredFinale.expiryPenaltyMultiplier
+    );
+    expect(bossEconomy.eventRewardMultiplier).toBeGreaterThanOrEqual(
+      pressuredFinale.eventRewardMultiplier
+    );
   });
 
   it('balances event economy outcomes between reward and penalty paths', () => {
-    const economyProfile = getPhaseEconomyProfile(
-      'HARD',
-      GameMode.NORMAL,
-      'MIDGAME',
-      62,
-      { fatigueLevel: 0.56, pressureLevel: 0.52 }
-    );
+    const economyProfile = getPhaseEconomyProfile('HARD', GameMode.NORMAL, 'MIDGAME', 62, {
+      fatigueLevel: 0.56,
+      pressureLevel: 0.52
+    });
     const success = getEventResolutionBudgetDelta(
       3,
       true,
@@ -578,13 +649,10 @@ describe('Game Logic Regressions', () => {
   });
 
   it('paces mission rewards and timeout penalties with streak and economy pressure', () => {
-    const economyProfile = getPhaseEconomyProfile(
-      'EXTREME',
-      GameMode.HARDCORE,
-      'FINALE',
-      82,
-      { fatigueLevel: 0.84, pressureLevel: 0.7 }
-    );
+    const economyProfile = getPhaseEconomyProfile('EXTREME', GameMode.HARDCORE, 'FINALE', 82, {
+      fatigueLevel: 0.84,
+      pressureLevel: 0.7
+    });
     const paced = getMissionRewardPacingMultiplier(
       economyProfile,
       { missionSuccessStreak: 3, missionFailStreak: 1 },
@@ -609,39 +677,40 @@ describe('Game Logic Regressions', () => {
   });
 
   it('applies expiry budget penalties by severity and live load', () => {
-    const economyProfile = getPhaseEconomyProfile(
-      'HARD',
-      GameMode.SPEEDRUN,
-      'FINALE',
-      78,
-      { fatigueLevel: 0.72, pressureLevel: 0.68 }
-    );
+    const economyProfile = getPhaseEconomyProfile('HARD', GameMode.SPEEDRUN, 'FINALE', 78, {
+      fatigueLevel: 0.72,
+      pressureLevel: 0.68
+    });
     const lowSeverityPenalty = getExpiredEventsBudgetPenalty(
-      [{
-        id: 'exp_1',
-        systemId: SystemType.SOUND,
-        title: 'A',
-        description: 'A',
-        severity: 1,
-        expiresAt: 0,
-        correctAction: '',
-        options: [{ label: 'x', isCorrect: true, stressImpact: -1 }]
-      }],
+      [
+        {
+          id: 'exp_1',
+          systemId: SystemType.SOUND,
+          title: 'A',
+          description: 'A',
+          severity: 1,
+          expiresAt: 0,
+          correctAction: '',
+          options: [{ label: 'x', isCorrect: true, stressImpact: -1 }]
+        }
+      ],
       2,
       economyProfile,
       78
     );
     const highSeverityPenalty = getExpiredEventsBudgetPenalty(
-      [{
-        id: 'exp_2',
-        systemId: SystemType.SOUND,
-        title: 'B',
-        description: 'B',
-        severity: 3,
-        expiresAt: 0,
-        correctAction: '',
-        options: [{ label: 'x', isCorrect: true, stressImpact: -1 }]
-      }],
+      [
+        {
+          id: 'exp_2',
+          systemId: SystemType.SOUND,
+          title: 'B',
+          description: 'B',
+          severity: 3,
+          expiresAt: 0,
+          correctAction: '',
+          options: [{ label: 'x', isCorrect: true, stressImpact: -1 }]
+        }
+      ],
       5,
       economyProfile,
       78
@@ -675,7 +744,9 @@ describe('Game Logic Regressions', () => {
       rewardCash: 1400
     };
 
-    expect(getMissionComplexityScore(advancedMission)).toBeGreaterThan(getMissionComplexityScore(basicMission));
+    expect(getMissionComplexityScore(advancedMission)).toBeGreaterThan(
+      getMissionComplexityScore(basicMission)
+    );
   });
 
   it('computes higher mission fit when systems are already close to criteria', () => {
@@ -693,28 +764,126 @@ describe('Game Logic Regressions', () => {
     };
 
     const closeSystems = {
-      [SystemType.SOUND]: { id: SystemType.SOUND, name: 'Sound', health: 100, status: 'OK' as const, faderValue: 52, stability: 100, driftSpeed: 1 },
-      [SystemType.LIGHTS]: { id: SystemType.LIGHTS, name: 'Lights', health: 100, status: 'OK' as const, faderValue: 55, stability: 100, driftSpeed: 1 },
-      [SystemType.VIDEO]: { id: SystemType.VIDEO, name: 'Video', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 },
-      [SystemType.STAGE]: { id: SystemType.STAGE, name: 'Stage', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 }
+      [SystemType.SOUND]: {
+        id: SystemType.SOUND,
+        name: 'Sound',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 52,
+        stability: 100,
+        driftSpeed: 1
+      },
+      [SystemType.LIGHTS]: {
+        id: SystemType.LIGHTS,
+        name: 'Lights',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 55,
+        stability: 100,
+        driftSpeed: 1
+      },
+      [SystemType.VIDEO]: {
+        id: SystemType.VIDEO,
+        name: 'Video',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      },
+      [SystemType.STAGE]: {
+        id: SystemType.STAGE,
+        name: 'Stage',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      }
     };
     const farSystems = {
-      [SystemType.SOUND]: { id: SystemType.SOUND, name: 'Sound', health: 100, status: 'OK' as const, faderValue: 20, stability: 100, driftSpeed: 1 },
-      [SystemType.LIGHTS]: { id: SystemType.LIGHTS, name: 'Lights', health: 100, status: 'OK' as const, faderValue: 85, stability: 100, driftSpeed: 1 },
-      [SystemType.VIDEO]: { id: SystemType.VIDEO, name: 'Video', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 },
-      [SystemType.STAGE]: { id: SystemType.STAGE, name: 'Stage', health: 100, status: 'OK' as const, faderValue: 50, stability: 100, driftSpeed: 1 }
+      [SystemType.SOUND]: {
+        id: SystemType.SOUND,
+        name: 'Sound',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 20,
+        stability: 100,
+        driftSpeed: 1
+      },
+      [SystemType.LIGHTS]: {
+        id: SystemType.LIGHTS,
+        name: 'Lights',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 85,
+        stability: 100,
+        driftSpeed: 1
+      },
+      [SystemType.VIDEO]: {
+        id: SystemType.VIDEO,
+        name: 'Video',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      },
+      [SystemType.STAGE]: {
+        id: SystemType.STAGE,
+        name: 'Stage',
+        health: 100,
+        status: 'OK' as const,
+        faderValue: 50,
+        stability: 100,
+        driftSpeed: 1
+      }
     };
 
-    expect(getMissionSystemFitScore(mission, closeSystems)).toBeGreaterThan(getMissionSystemFitScore(mission, farSystems));
+    expect(getMissionSystemFitScore(mission, closeSystems)).toBeGreaterThan(
+      getMissionSystemFitScore(mission, farSystems)
+    );
   });
 
   it('reduces target mission complexity under high stress and low budget', () => {
     const calmTarget = getMissionTargetComplexity({
       systems: {
-        [SystemType.SOUND]: { id: SystemType.SOUND, name: 'Sound', health: 100, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 },
-        [SystemType.LIGHTS]: { id: SystemType.LIGHTS, name: 'Lights', health: 100, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 },
-        [SystemType.VIDEO]: { id: SystemType.VIDEO, name: 'Video', health: 100, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 },
-        [SystemType.STAGE]: { id: SystemType.STAGE, name: 'Stage', health: 100, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 }
+        [SystemType.SOUND]: {
+          id: SystemType.SOUND,
+          name: 'Sound',
+          health: 100,
+          status: 'OK',
+          faderValue: 50,
+          stability: 100,
+          driftSpeed: 1
+        },
+        [SystemType.LIGHTS]: {
+          id: SystemType.LIGHTS,
+          name: 'Lights',
+          health: 100,
+          status: 'OK',
+          faderValue: 50,
+          stability: 100,
+          driftSpeed: 1
+        },
+        [SystemType.VIDEO]: {
+          id: SystemType.VIDEO,
+          name: 'Video',
+          health: 100,
+          status: 'OK',
+          faderValue: 50,
+          stability: 100,
+          driftSpeed: 1
+        },
+        [SystemType.STAGE]: {
+          id: SystemType.STAGE,
+          name: 'Stage',
+          health: 100,
+          status: 'OK',
+          faderValue: 50,
+          stability: 100,
+          driftSpeed: 1
+        }
       },
       stats: { stress: 35, budget: 7000 },
       phase: 'FINALE',
@@ -723,10 +892,42 @@ describe('Game Logic Regressions', () => {
     });
     const crisisTarget = getMissionTargetComplexity({
       systems: {
-        [SystemType.SOUND]: { id: SystemType.SOUND, name: 'Sound', health: 100, status: 'OK', faderValue: 20, stability: 100, driftSpeed: 1 },
-        [SystemType.LIGHTS]: { id: SystemType.LIGHTS, name: 'Lights', health: 100, status: 'OK', faderValue: 80, stability: 100, driftSpeed: 1 },
-        [SystemType.VIDEO]: { id: SystemType.VIDEO, name: 'Video', health: 100, status: 'OK', faderValue: 25, stability: 100, driftSpeed: 1 },
-        [SystemType.STAGE]: { id: SystemType.STAGE, name: 'Stage', health: 100, status: 'OK', faderValue: 75, stability: 100, driftSpeed: 1 }
+        [SystemType.SOUND]: {
+          id: SystemType.SOUND,
+          name: 'Sound',
+          health: 100,
+          status: 'OK',
+          faderValue: 20,
+          stability: 100,
+          driftSpeed: 1
+        },
+        [SystemType.LIGHTS]: {
+          id: SystemType.LIGHTS,
+          name: 'Lights',
+          health: 100,
+          status: 'OK',
+          faderValue: 80,
+          stability: 100,
+          driftSpeed: 1
+        },
+        [SystemType.VIDEO]: {
+          id: SystemType.VIDEO,
+          name: 'Video',
+          health: 100,
+          status: 'OK',
+          faderValue: 25,
+          stability: 100,
+          driftSpeed: 1
+        },
+        [SystemType.STAGE]: {
+          id: SystemType.STAGE,
+          name: 'Stage',
+          health: 100,
+          status: 'OK',
+          faderValue: 75,
+          stability: 100,
+          driftSpeed: 1
+        }
       },
       stats: { stress: 90, budget: 800 },
       phase: 'FINALE',
@@ -755,9 +956,7 @@ describe('Game Logic Regressions', () => {
         id: 'recovery',
         title: 'Recuperación',
         description: 'Ventana amplia para estabilizar',
-        criteria: [
-          { systemId: SystemType.SOUND, min: 30, max: 70 }
-        ],
+        criteria: [{ systemId: SystemType.SOUND, min: 30, max: 70 }],
         holdDuration: 10,
         timeout: 40,
         rewardCash: 500
@@ -770,10 +969,42 @@ describe('Game Logic Regressions', () => {
       0,
       {
         systems: {
-          [SystemType.SOUND]: { id: SystemType.SOUND, name: 'Sound', health: 70, status: 'WARNING', faderValue: 28, stability: 100, driftSpeed: 1 },
-          [SystemType.LIGHTS]: { id: SystemType.LIGHTS, name: 'Lights', health: 68, status: 'WARNING', faderValue: 76, stability: 100, driftSpeed: 1 },
-          [SystemType.VIDEO]: { id: SystemType.VIDEO, name: 'Video', health: 72, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 },
-          [SystemType.STAGE]: { id: SystemType.STAGE, name: 'Stage', health: 75, status: 'OK', faderValue: 50, stability: 100, driftSpeed: 1 }
+          [SystemType.SOUND]: {
+            id: SystemType.SOUND,
+            name: 'Sound',
+            health: 70,
+            status: 'WARNING',
+            faderValue: 28,
+            stability: 100,
+            driftSpeed: 1
+          },
+          [SystemType.LIGHTS]: {
+            id: SystemType.LIGHTS,
+            name: 'Lights',
+            health: 68,
+            status: 'WARNING',
+            faderValue: 76,
+            stability: 100,
+            driftSpeed: 1
+          },
+          [SystemType.VIDEO]: {
+            id: SystemType.VIDEO,
+            name: 'Video',
+            health: 72,
+            status: 'OK',
+            faderValue: 50,
+            stability: 100,
+            driftSpeed: 1
+          },
+          [SystemType.STAGE]: {
+            id: SystemType.STAGE,
+            name: 'Stage',
+            health: 75,
+            status: 'OK',
+            faderValue: 50,
+            stability: 100,
+            driftSpeed: 1
+          }
         },
         stats: { stress: 85, budget: 700 },
         phase: 'FINALE',
@@ -808,18 +1039,22 @@ describe('Game Logic Regressions', () => {
     };
     const allSystemEvents = {
       [SystemType.SOUND]: [sourceDefinition],
-      [SystemType.LIGHTS]: [{
-        title: 'Objetivo Luces',
-        description: 'Objetivo A',
-        allowedScenarios: ['NORMAL'],
-        options: [{ label: 'A', isCorrect: true, stressImpact: -2 }]
-      }],
-      [SystemType.VIDEO]: [{
-        title: 'Objetivo Video',
-        description: 'Objetivo B',
-        allowedScenarios: ['NORMAL'],
-        options: [{ label: 'B', isCorrect: true, stressImpact: -2 }]
-      }],
+      [SystemType.LIGHTS]: [
+        {
+          title: 'Objetivo Luces',
+          description: 'Objetivo A',
+          allowedScenarios: ['NORMAL'],
+          options: [{ label: 'A', isCorrect: true, stressImpact: -2 }]
+        }
+      ],
+      [SystemType.VIDEO]: [
+        {
+          title: 'Objetivo Video',
+          description: 'Objetivo B',
+          allowedScenarios: ['NORMAL'],
+          options: [{ label: 'B', isCorrect: true, stressImpact: -2 }]
+        }
+      ],
       [SystemType.STAGE]: []
     };
 

@@ -111,7 +111,8 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CONTEXT',
         title: 'Cambio de Acto: Setup A',
-        message: 'Dirección de Show: "Entramos a cambio de acto. Prioriza LIGHTS/STAGE en transición limpia."',
+        message:
+          'Dirección de Show: "Entramos a cambio de acto. Prioriza LIGHTS/STAGE en transición limpia."',
         character: 'Dirección Técnica',
         cooldown: 28000,
         triggerCondition: (stats, systems) =>
@@ -122,7 +123,8 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'STORY',
         title: 'Cambio de Acto: Ventana Segura',
-        message: 'Producción: "Buen setup. Conserva SOUND/VIDEO en rango de broadcast antes del drop."',
+        message:
+          'Producción: "Buen setup. Conserva SOUND/VIDEO en rango de broadcast antes del drop."',
         cooldown: 30000,
         triggerCondition: (stats, systems) =>
           stats.timeRemaining < 72 &&
@@ -135,13 +137,14 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CHARACTER',
         title: 'Cambio de Acto: Cierre de Precisión',
-        message: 'Headliner: "Perfect timing. Cerrá esta sección sin perder estabilidad y nos llevamos el show."',
+        message:
+          'Headliner: "Perfect timing. Cerrá esta sección sin perder estabilidad y nos llevamos el show."',
         character: 'Headliner',
         cooldown: 32000,
         triggerCondition: (stats, systems) =>
           stats.timeRemaining < 44 &&
           stats.publicInterest >= 60 &&
-          Object.values(systems).every(system => system.status === 'OK')
+          Object.values(systems).every((system) => system.status === 'OK')
       }
     ]
   },
@@ -152,7 +155,8 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CONTEXT',
         title: 'Cadena Satelital: Ventana 1',
-        message: 'Broadcast Global: "Tenemos enlace limpio por 30s. Asegurá SOUND+VIDEO en precisión."',
+        message:
+          'Broadcast Global: "Tenemos enlace limpio por 30s. Asegurá SOUND+VIDEO en precisión."',
         character: 'Centro de Broadcast',
         cooldown: 30000,
         triggerCondition: (stats, systems) =>
@@ -163,7 +167,8 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'STORY',
         title: 'Cadena Satelital: Corte Internacional',
-        message: 'Producción Internacional: "Subimos señal a 12 países. No abras demasiado LIGHTS ni STAGE."',
+        message:
+          'Producción Internacional: "Subimos señal a 12 países. No abras demasiado LIGHTS ni STAGE."',
         cooldown: 32000,
         triggerCondition: (stats, systems) =>
           stats.timeRemaining < 64 &&
@@ -174,12 +179,11 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CHARACTER',
         title: 'Cadena Satelital: Confirmación Final',
-        message: 'Director Global: "Link confirmado. Mantené este bloque hasta cierre y el contrato queda renovado."',
+        message:
+          'Director Global: "Link confirmado. Mantené este bloque hasta cierre y el contrato queda renovado."',
         character: 'Director Global',
         cooldown: 34000,
-        triggerCondition: (stats) =>
-          stats.timeRemaining < 38 &&
-          stats.clientSatisfaction >= 58
+        triggerCondition: (stats) => stats.timeRemaining < 38 && stats.clientSatisfaction >= 58
       }
     ]
   },
@@ -190,18 +194,20 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CONTEXT',
         title: 'Failover Manual: Inicio',
-        message: 'Comando Técnico: "Perdimos redundancia primaria. Prioridad: evitar doble sistema en crítico."',
+        message:
+          'Comando Técnico: "Perdimos redundancia primaria. Prioridad: evitar doble sistema en crítico."',
         character: 'Centro de Control',
         cooldown: 26000,
         triggerCondition: (stats, systems) => {
-          const unstable = Object.values(systems).filter(system => system.status !== 'OK').length;
+          const unstable = Object.values(systems).filter((system) => system.status !== 'OK').length;
           return stats.timeRemaining < 95 && unstable >= 2;
         }
       },
       {
         type: 'STORY',
         title: 'Failover Manual: Contención',
-        message: 'Operaciones: "Contenemos picos. Conserva STAGE bajo 60% y VIDEO estable para evitar cascada."',
+        message:
+          'Operaciones: "Contenemos picos. Conserva STAGE bajo 60% y VIDEO estable para evitar cascada."',
         cooldown: 30000,
         triggerCondition: (stats, systems) =>
           stats.timeRemaining < 68 &&
@@ -212,11 +218,14 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CHARACTER',
         title: 'Failover Manual: Recuperación',
-        message: 'Supervisor de Crisis: "Buen trabajo. Si cierras así, evitamos apagón total del venue."',
+        message:
+          'Supervisor de Crisis: "Buen trabajo. Si cierras así, evitamos apagón total del venue."',
         character: 'Supervisor de Crisis',
         cooldown: 34000,
         triggerCondition: (stats, systems) => {
-          const criticalCount = Object.values(systems).filter(system => system.status === 'CRITICAL').length;
+          const criticalCount = Object.values(systems).filter(
+            (system) => system.status === 'CRITICAL'
+          ).length;
           return stats.timeRemaining < 42 && criticalCount === 0;
         }
       }
@@ -229,7 +238,8 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CONTEXT',
         title: 'Frente de Viento',
-        message: 'Meteorología: "Ráfaga entrante. Revisa STAGE y margen de seguridad de estructura."',
+        message:
+          'Meteorología: "Ráfaga entrante. Revisa STAGE y margen de seguridad de estructura."',
         cooldown: 30000,
         triggerCondition: (stats, systems, scenario) =>
           !!scenario &&
@@ -239,7 +249,8 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'STORY',
         title: 'Frente de Viento: Ajuste de Potencia',
-        message: 'Stage Crew: "Mantén LIGHTS y SOUND sincronizados mientras reducimos carga de techo."',
+        message:
+          'Stage Crew: "Mantén LIGHTS y SOUND sincronizados mientras reducimos carga de techo."',
         cooldown: 31000,
         triggerCondition: (stats, systems) =>
           stats.timeRemaining < 70 &&
@@ -249,12 +260,11 @@ const NARRATIVE_SEQUENCES: NarrativeSequenceDefinition[] = [
       {
         type: 'CHARACTER',
         title: 'Frente de Viento: Ventana Estable',
-        message: 'Coordinación General: "La estructura respondió bien. Preserva esta estabilidad hasta final."',
+        message:
+          'Coordinación General: "La estructura respondió bien. Preserva esta estabilidad hasta final."',
         character: 'Coordinación General',
         cooldown: 32000,
-        triggerCondition: (stats) =>
-          stats.timeRemaining < 40 &&
-          stats.stress < 72
+        triggerCondition: (stats) => stats.timeRemaining < 40 && stats.stress < 72
       }
     ]
   }
@@ -266,7 +276,8 @@ const NARRATIVE_EVENTS: NarrativeEvent[] = [
     id: 'guitarist_problem',
     type: 'STORY',
     title: 'Problema del Guitarrista',
-    message: 'Roberto (Stage Manager): "El guitarrista está teniendo problemas con su amplificador. Mantén el sonido estable mientras lo arreglamos."',
+    message:
+      'Roberto (Stage Manager): "El guitarrista está teniendo problemas con su amplificador. Mantén el sonido estable mientras lo arreglamos."',
     triggerCondition: (stats, systems, scenario) =>
       systems[SystemType.SOUND].faderValue > 60 && stats.publicInterest > 40,
     cooldown: 30000
@@ -275,7 +286,8 @@ const NARRATIVE_EVENTS: NarrativeEvent[] = [
     id: 'singer_sick',
     type: 'CHARACTER',
     title: 'Cantante Enferma',
-    message: 'Ana (Productora): "La cantante principal está enferma. Necesitas ajustar el micrófono para compensar su voz débil."',
+    message:
+      'Ana (Productora): "La cantante principal está enferma. Necesitas ajustar el micrófono para compensar su voz débil."',
     character: 'Ana "La Jefa"',
     triggerCondition: (stats, systems, scenario) =>
       systems[SystemType.SOUND].health < 70 && stats.clientSatisfaction < 60,
@@ -320,15 +332,17 @@ const NARRATIVE_EVENTS: NarrativeEvent[] = [
     title: 'Momento Técnico Perfecto',
     message: 'Kai (Stage Manager): "Todo está funcionando perfectamente. Mantén este ritmo."',
     triggerCondition: (stats, systems, scenario) =>
-      Object.values(systems).every(system => system.status === 'OK' && system.faderValue >= 35 && system.faderValue <= 65) &&
-      stats.stress < 50,
+      Object.values(systems).every(
+        (system) => system.status === 'OK' && system.faderValue >= 35 && system.faderValue <= 65
+      ) && stats.stress < 50,
     cooldown: 20000
   },
   {
     id: 'weather_shift',
     type: 'CONTEXT',
     title: 'Cambio de Clima',
-    message: 'Operaciones: "Se viene una ráfaga fuerte. Revisá STAGE y mantené margen de seguridad."',
+    message:
+      'Operaciones: "Se viene una ráfaga fuerte. Revisá STAGE y mantené margen de seguridad."',
     triggerCondition: (stats, systems, scenario) =>
       !!scenario && scenario.id === 'FESTIVAL' && systems[SystemType.STAGE].faderValue > 65,
     cooldown: 35000
@@ -337,7 +351,8 @@ const NARRATIVE_EVENTS: NarrativeEvent[] = [
     id: 'vip_arrival',
     type: 'STORY',
     title: 'Llegó el VIP',
-    message: 'Producción: "Llegó un invitado clave. Necesitamos impecable audio y luces en esta sección."',
+    message:
+      'Producción: "Llegó un invitado clave. Necesitamos impecable audio y luces en esta sección."',
     triggerCondition: (stats, systems) =>
       stats.timeRemaining < 80 &&
       systems[SystemType.SOUND].status === 'OK' &&
@@ -348,12 +363,15 @@ const NARRATIVE_EVENTS: NarrativeEvent[] = [
     id: 'arena_cue_storm',
     type: 'CONTEXT',
     title: 'Tormenta de Cues',
-    message: 'Dirección Técnica: "Entramos a la parte más densa del show. Necesito cambios rápidos y precisos en LIGHTS/STAGE."',
+    message:
+      'Dirección Técnica: "Entramos a la parte más densa del show. Necesito cambios rápidos y precisos en LIGHTS/STAGE."',
     triggerCondition: (stats, systems, scenario) => {
       if (!scenario || (scenario.id !== 'ARENA' && scenario.id !== 'WORLD_TOUR')) {
         return false;
       }
-      return systems[SystemType.LIGHTS].faderValue > 65 && systems[SystemType.STAGE].faderValue > 60;
+      return (
+        systems[SystemType.LIGHTS].faderValue > 65 && systems[SystemType.STAGE].faderValue > 60
+      );
     },
     cooldown: 28000
   },
@@ -361,15 +379,18 @@ const NARRATIVE_EVENTS: NarrativeEvent[] = [
     id: 'satellite_lock',
     type: 'STORY',
     title: 'Ventana Satelital',
-    message: 'Broadcast: "Tenemos 20 segundos de ventana limpia. Mantén VIDEO y SOUND dentro de parámetros de transmisión."',
+    message:
+      'Broadcast: "Tenemos 20 segundos de ventana limpia. Mantén VIDEO y SOUND dentro de parámetros de transmisión."',
     triggerCondition: (stats, systems, scenario) => {
       if (!scenario || scenario.id !== 'WORLD_TOUR') {
         return false;
       }
-      return stats.timeRemaining < 75 &&
+      return (
+        stats.timeRemaining < 75 &&
         systems[SystemType.VIDEO].faderValue >= 45 &&
         systems[SystemType.VIDEO].faderValue <= 65 &&
-        systems[SystemType.SOUND].status === 'OK';
+        systems[SystemType.SOUND].status === 'OK'
+      );
     },
     cooldown: 36000
   },
@@ -377,20 +398,28 @@ const NARRATIVE_EVENTS: NarrativeEvent[] = [
     id: 'blackout_failover',
     type: 'CHARACTER',
     title: 'Protocolo de Contingencia',
-    message: 'Comando Técnico: "Activamos failover manual. Mantén la calma y evita que dos sistemas caigan al mismo tiempo."',
+    message:
+      'Comando Técnico: "Activamos failover manual. Mantén la calma y evita que dos sistemas caigan al mismo tiempo."',
     character: 'Centro de Control',
     triggerCondition: (stats, systems, scenario) => {
       if (!scenario || scenario.id !== 'BLACKOUT_PROTOCOL') {
         return false;
       }
-      const unstableSystems = Object.values(systems).filter(system => system.status !== 'OK').length;
+      const unstableSystems = Object.values(systems).filter(
+        (system) => system.status !== 'OK'
+      ).length;
       return stats.stress > 50 && unstableSystems >= 2;
     },
     cooldown: 30000
   }
 ];
 
-export const useNarrativeSystem = ({ stats, systems, isPlaying, currentScenario }: UseNarrativeSystemProps) => {
+export const useNarrativeSystem = ({
+  stats,
+  systems,
+  isPlaying,
+  currentScenario
+}: UseNarrativeSystemProps) => {
   const [activeNarrative, setActiveNarrative] = useState<NarrativeEvent | null>(null);
   const activeNarrativeRef = useRef<NarrativeEvent | null>(null);
   const lastTriggeredRef = useRef<Map<string, number>>(new Map());
@@ -475,7 +504,10 @@ export const useNarrativeSystem = ({ stats, systems, isPlaying, currentScenario 
       const lastTriggered = lastTriggeredRef.current.get(narrative.id) || 0;
       const cooldown = narrative.cooldown || 30000;
 
-      if (now - lastTriggered > cooldown && narrative.triggerCondition(statsNow, systemsNow, scenarioNow)) {
+      if (
+        now - lastTriggered > cooldown &&
+        narrative.triggerCondition(statsNow, systemsNow, scenarioNow)
+      ) {
         lastTriggeredRef.current.set(narrative.id, now);
         showNarrative(narrative);
         break;
