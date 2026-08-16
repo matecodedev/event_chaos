@@ -1,5 +1,12 @@
 @import url('https://fonts.googleapis.com/css2?family=JetBrains+Mono:wght@400;500;700&family=Saira+Condensed:wght@500;600;700&family=Space+Grotesk:wght@400;500;600;700&display=swap');
 
+/* Tailwind is compiled at build time. The directives stay above the custom
+   rules below so project styles win over utilities at equal specificity
+   (notably .font-mono, which must resolve to --aaa-font-mono). */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
 *,
 *::before,
 *::after {
@@ -42,12 +49,12 @@
   --aaa-aurora-alpha-b: 0.2;
   --aaa-aurora-alpha-c: 0.14;
 
-  --aaa-scene-image: url('/assets/aaa/gameplay_bg_desktop_clean_v1.jpg');
+  --aaa-scene-image: url('/assets/aaa/gameplay_bg_desktop_clean_v1.webp');
   --aaa-scene-image-opacity: 0.4;
-  --aaa-fx-noise-image: url('/assets/aaa/fx_hud_noise_tile_v1.jpg');
-  --aaa-fx-scanlines-image: url('/assets/aaa/fx_scanlines_tile_v1.jpg');
-  --aaa-fx-warning-chevron-image: url('/assets/aaa/fx_warning_chevrons_tile_v1.jpg');
-  --aaa-fx-scratches-image: url('/assets/aaa/fx_glass_micro_scratches_tile_v1.jpg');
+  --aaa-fx-noise-image: url('/assets/aaa/fx_hud_noise_tile_v1.webp');
+  --aaa-fx-scanlines-image: url('/assets/aaa/fx_scanlines_tile_v1.webp');
+  --aaa-fx-warning-chevron-image: url('/assets/aaa/fx_warning_chevrons_tile_v1.webp');
+  --aaa-fx-scratches-image: url('/assets/aaa/fx_glass_micro_scratches_tile_v1.webp');
 }
 
 html,
