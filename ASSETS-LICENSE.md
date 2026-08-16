@@ -3,7 +3,10 @@
 Copyright (c) 2026 MateCode. All rights reserved.
 
 The **source code** of Event Chaos is MIT licensed — see [`LICENSE`](LICENSE).
-This document covers the **assets**, which are not.
+That MIT grant covers the code and nothing else.
+
+This document covers the **assets**, which are licensed separately and more
+restrictively.
 
 ## What this covers
 

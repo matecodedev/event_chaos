@@ -8,6 +8,8 @@ You are in the technical booth. Cues stack up, clients change their minds mid-sh
 
 **[Play it →](https://event-chaos.netlify.app)** · Desktop and mobile · No install, no account
 
+> Code is [MIT](LICENSE). The artwork is [not](ASSETS-LICENSE.md) — credit required, no commercial use.
+
 ---
 
 ## Run it locally
